@@ -183,18 +183,17 @@ function updateSunbedColor(sunbed, step) {
     console.log(`Actualizando color de hamaca ${sunbed.attr('id')} con paso ${step}`);
     
     // Remover todas las clases de step existentes
-    sunbed.removeClass('step1 step2 step3 step4 step5 step6');
+    for (let i = 1; i <= 6; i++) {
+        sunbed.removeClass('step' + i);
+    }
     
-    // Asegurarnos de que el step sea un número válido entre 1 y 6
-    const validStep = Math.max(1, Math.min(6, parseInt(step) || 1));
-    
-    // Añadir la clase correspondiente
-    sunbed.addClass(`step${validStep}`);
+    // Añadir la nueva clase
+    sunbed.addClass('step' + step);
     
     // Actualizar el atributo data-step
-    sunbed.attr('data-step', validStep);
+    sunbed.attr('data-step', step);
     
-    console.log(`Hamaca ${sunbed.attr('id')} actualizada a paso ${validStep}`);
+    console.log(`Hamaca ${sunbed.attr('id')} actualizada a paso ${step}`);
 }
 
 // Función para obtener el color correspondiente a cada paso
