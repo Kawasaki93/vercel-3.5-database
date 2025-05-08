@@ -1,3 +1,8 @@
+// Importar las funciones necesarias de Firebase
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+
 // Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBRuwdtVYdx6MMM7D46oVp3MSqV0eNAluA",
@@ -11,16 +16,14 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+// Exportar las referencias necesarias
+export { db };
 
 // Referencias a la base de datos
-const db = firebase.firestore();
 const sunbedsRef = db.collection('sunbeds');
-const calculatorRef = db.collection('calculator');
-const customersRef = db.collection('customers');
-
-// Exportar las referencias para uso en otros archivos
-window.db = db;
-window.sunbedsRef = sunbedsRef;
-window.calculatorRef = calculatorRef;
-window.customersRef = customersRef; 
+const operationsRef = db.collection('operations');
+const historyRef = db.collection('history'); 

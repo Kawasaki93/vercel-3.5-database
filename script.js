@@ -1,3 +1,6 @@
+import { db } from './firebase-config.js';
+import { collection, doc, updateDoc, addDoc, getDocs, query, where, orderBy, serverTimestamp } from 'firebase/firestore';
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((reg) => {
@@ -7,8 +10,6 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-
-
 
 let variable1;
 for (var x = 1; x < 126; x++) {
@@ -234,11 +235,7 @@ for (var x = 1; x < 126; x++) {
     cloned_element.find(".sunbed_name").html(1);
 } else if (x === 125) {
     cloned_element.find(".sunbed_name").html(0);
-
-
-
 }
-
 
   $(".beach_wrapper").append(cloned_element);
 }
@@ -282,8 +279,6 @@ $("#clon_83,#clon_84,#clon_85,#clon_89,#clon_90,#clon_91,#clon_92,#clon_93,#clon
 
 //Clicking function-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
 //clear localstorage
 function clearClick(number) {
     localStorage.clear();
@@ -296,15 +291,14 @@ function clearClick(number) {
 function toggleDesconectadosFila8() {
     var $desconectadosFila8 = $(".desconectadosfila8");
     var currentVisibility = $desconectadosFila8.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $desconectadosFila8.css("visibility", newVisibility);
-    localStorage.setItem("desconectadosFila8Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('desconectadosfila8').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $desconectadosFila8.css("visibility", "visible");
+        localStorage.setItem("desconectadosFila8Visibility", "visible");
+    } else {
+        $desconectadosFila8.css("visibility", "hidden");
+        localStorage.setItem("desconectadosFila8Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 8-------
@@ -321,15 +315,14 @@ $(document).ready(function() {
 function toggledesconectadosFila4() {
     var $desconectadosFila4 = $(".desconectadosFila4");
     var currentVisibility = $desconectadosFila4.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $desconectadosFila4.css("visibility", newVisibility);
-    localStorage.setItem("desconectadosFila4Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('desconectadosFila4').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $desconectadosFila4.css("visibility", "visible");
+        localStorage.setItem("desconectadosFila4Visibility", "visible");
+    } else {
+        $desconectadosFila4.css("visibility", "hidden");
+        localStorage.setItem("desconectadosFila4Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 4-----
@@ -346,15 +339,14 @@ $(document).ready(function() {
 function toggledesconectadosFila3() {
     var $desconectadosFila3 = $(".desconectadosFila3");
     var currentVisibility = $desconectadosFila3.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $desconectadosFila3.css("visibility", newVisibility);
-    localStorage.setItem("desconectadosFila3Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('desconectadosFila3').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $desconectadosFila3.css("visibility", "visible");
+        localStorage.setItem("desconectadosFila3Visibility", "visible");
+    } else {
+        $desconectadosFila3.css("visibility", "hidden");
+        localStorage.setItem("desconectadosFila3Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 3-----
@@ -371,15 +363,14 @@ $(document).ready(function() {
 function toggledesconectadosFila2() {
     var $desconectadosFila2 = $(".desconectadosFila2");
     var currentVisibility = $desconectadosFila2.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $desconectadosFila2.css("visibility", newVisibility);
-    localStorage.setItem("desconectadosFila2Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('desconectadosFila2').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $desconectadosFila2.css("visibility", "visible");
+        localStorage.setItem("desconectadosFila2Visibility", "visible");
+    } else {
+        $desconectadosFila2.css("visibility", "hidden");
+        localStorage.setItem("desconectadosFila2Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 2-----
@@ -392,22 +383,18 @@ $(document).ready(function() {
     }
 });
 
-
-
-
 //VISIBILIDAD DE LA FILA 1-----------------------------------
 function toggledesconectadosFila1() {
     var $desconectadosFila1 = $(".desconectadosFila1");
     var currentVisibility = $desconectadosFila1.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $desconectadosFila1.css("visibility", newVisibility);
-    localStorage.setItem("desconectadosFila1Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('desconectadosFila1').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $desconectadosFila1.css("visibility", "visible");
+        localStorage.setItem("desconectadosFila1Visibility", "visible");
+    } else {
+        $desconectadosFila1.css("visibility", "hidden");
+        localStorage.setItem("desconectadosFila1Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 1-----
@@ -424,15 +411,14 @@ $(document).ready(function() {
 function toggleDesconectadosFila0() {
     var $desconectadosFila0 = $(".desconectadosFila0");
     var currentVisibility = $desconectadosFila0.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $desconectadosFila0.css("visibility", newVisibility);
-    localStorage.setItem("desconectadosFila0Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('desconectadosFila0').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $desconectadosFila0.css("visibility", "visible");
+        localStorage.setItem("desconectadosFila0Visibility", "visible");
+    } else {
+        $desconectadosFila0.css("visibility", "hidden");
+        localStorage.setItem("desconectadosFila0Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 0------
@@ -449,15 +435,14 @@ $(document).ready(function() {
 function toggleZonalibre() {
     var $Zonalibre = $(".Zonalibre");
     var currentVisibility = $Zonalibre.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $Zonalibre.css("visibility", newVisibility);
-    localStorage.setItem("ZonalibreVisibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('Zonalibre').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $Zonalibre.css("visibility", "visible");
+        localStorage.setItem("ZonalibreVisibility", "visible");
+    } else {
+        $Zonalibre.css("visibility", "hidden");
+        localStorage.setItem("ZonalibreVisibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de ZONA LIBRE 1----
@@ -474,15 +459,14 @@ $(document).ready(function() {
 function toggleZonalibre2() {
     var $Zonalibre2 = $(".Zonalibre2");
     var currentVisibility = $Zonalibre2.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $Zonalibre2.css("visibility", newVisibility);
-    localStorage.setItem("Zonalibre2Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('Zonalibre2').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $Zonalibre2.css("visibility", "visible");
+        localStorage.setItem("Zonalibre2Visibility", "visible");
+    } else {
+        $Zonalibre2.css("visibility", "hidden");
+        localStorage.setItem("Zonalibre2Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de ZONA LIBRE 2----
@@ -495,20 +479,18 @@ $(document).ready(function() {
     }
 });
 
-
 //VISIBILIDAD DEL CLON 10A--------------------------------------  
 function toggleclon10A() {
     var $clon10A = $(".clon10A");
     var currentVisibility = $clon10A.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $clon10A.css("visibility", newVisibility);
-    localStorage.setItem("clon10AVisibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('clon10A').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $clon10A.css("visibility", "visible");
+        localStorage.setItem("clon10AVisibility", "visible");
+    } else {
+        $clon10A.css("visibility", "hidden");
+        localStorage.setItem("clon10AVisibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad del CLON 10A----
@@ -525,15 +507,14 @@ $(document).ready(function() {
 function toggleclon0() {
     var $clon0 = $(".clon0");
     var currentVisibility = $clon0.css("visibility");
-    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    $clon0.css("visibility", newVisibility);
-    localStorage.setItem("clon0Visibility", newVisibility);
-    
-    // Sincronizar con Firebase
-    db.collection('visibility').doc('clon0').set({
-        visible: newVisibility === "visible"
-    });
+    if (currentVisibility === "hidden") {
+        $clon0.css("visibility", "visible");
+        localStorage.setItem("clon0Visibility", "visible");
+    } else {
+        $clon0.css("visibility", "hidden");
+        localStorage.setItem("clon0Visibility", "hidden");
+    }
 }
 
 // Al cargar la página, restaurar el estado de visibilidad del CLON 0----
@@ -591,106 +572,28 @@ var SunbedController = function() {
     return {
         init: function() {
             this.bind_listeners();
-            this.setupFirebaseListeners();
             this.restore_customers_name();
             this.restore_sunbeds_colors();
-            this.restore_circles_colors();
             this.retreive_prices();
             this.restore_comments();
             this.restore_total_sold();
-            this.restore_visibility();
-        },
-
-        setupFirebaseListeners: function() {
-            // Escuchar cambios en las hamacas
-            sunbedsRef.onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    const data = change.doc.data();
-                    const sunbedId = change.doc.id;
-                    
-                    if (change.type === "modified") {
-                        // Actualizar color
-                        if (data.color) {
-                            $(`#${sunbedId}`).removeClass().addClass('sunbed step' + data.color);
-                            $(`#${sunbedId}`).data('actual-step', data.color);
-                        }
-                        
-                        // Actualizar nombre del cliente
-                        if (data.customerName) {
-                            $(`#${sunbedId} input.customer_name`).val(data.customerName);
-                        }
-                    }
-                });
-            });
-
-            // Escuchar cambios en la calculadora
-            calculatorRef.onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    const data = change.doc.data();
-                    if (change.type === "modified") {
-                        totalEfectivo = data.totalEfectivo || 0;
-                        totalTarjeta = data.totalTarjeta || 0;
-                        this.update_prices();
-                    }
-                });
-            });
-
-            // Escuchar cambios en la visibilidad
-            db.collection('visibility').onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    const data = change.doc.data();
-                    const section = change.doc.id;
-                    
-                    if (data.visible !== undefined) {
-                        $(`.${section}`).css("visibility", data.visible ? "visible" : "hidden");
-                    }
-                });
-            });
-
-            // Escuchar cambios en los círculos
-            db.collection('circles').onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    const data = change.doc.data();
-                    const circleId = change.doc.id;
-                    
-                    if (change.type === "modified" || change.type === "added") {
-                        const circle = $(`#${circleId}`);
-                        if (circle.length) {
-                            // Eliminar clases anteriores
-                            for (let i = 0; i < 3; i++) {
-                                circle.removeClass('step' + i);
-                            }
-                            // Añadir nueva clase
-                            circle.addClass('step' + data.color);
-                            circle.data('actual-step', data.color);
-                        }
-                    }
-                });
-            });
         },
 
         bind_listeners: function() {
             $("input.customer_name").keyup(function () {
                 var text = $(this).val();
                 var target_id = $(this).closest(".sunbed").attr('id');
-                
-                // Guardar en localStorage
                 let target_key = 'customer_name' + target_id;
                 localStorage.setItem(target_key, text);
-                
-                // Sincronizar con Firebase
-                sunbedsRef.doc(target_id).update({
-                    customerName: text
-                });
             });
 
             $("#comments").keyup(function() {
-                let actual_value = $(this).val();
-                localStorage.setItem('comments', actual_value);
-                calculatorRef.doc('comments').set({
-                    text: actual_value
-                });
+               let actual_value = $(this).val();
+               localStorage.setItem('comments', actual_value);
             });
+
+          
+            
         },
 
         restore_customers_name: function() {
@@ -720,27 +623,6 @@ var SunbedController = function() {
             });
         },
 
-        restore_circles_colors: function() {
-            // Restaurar colores de círculos desde Firebase
-            db.collection('circles').get().then((snapshot) => {
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const circleId = doc.id;
-                    const circle = $(`#${circleId}`);
-                    
-                    if (circle.length) {
-                        // Eliminar clases anteriores
-                        for (let i = 0; i < 3; i++) {
-                            circle.removeClass('step' + i);
-                        }
-                        // Añadir nueva clase
-                        circle.addClass('step' + data.color);
-                        circle.data('actual-step', data.color);
-                    }
-                });
-            });
-        },
-
         retreive_prices: function() {
             shopping_cart = 0;
             total_sold = 0;
@@ -761,14 +643,6 @@ var SunbedController = function() {
         update_prices: function() {
             $("#shopping_cat_value").html(shopping_cart);
             $("#total_price_value").html(total_sold);
-            
-            // Sincronizar con Firebase
-            calculatorRef.doc('totals').set({
-                shoppingCart: shopping_cart,
-                totalSold: total_sold,
-                totalEfectivo: totalEfectivo,
-                totalTarjeta: totalTarjeta
-            });
         },
 
         reset_local_storage_except_customers: function () {           
@@ -798,19 +672,6 @@ var SunbedController = function() {
         restore_total_sold: function(){
             localStorage.getItem(total_sold);
             localStorage.removeItem(total_sold);
-        },
-
-        restore_visibility: function() {
-            // Restaurar visibilidad desde Firebase
-            db.collection('visibility').get().then((snapshot) => {
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const section = doc.id;
-                    if (data.visible !== undefined) {
-                        $(`.${section}`).css("visibility", data.visible ? "visible" : "hidden");
-                    }
-                });
-            });
         }
     };
 }();
@@ -830,7 +691,7 @@ SunbedController.init();
 let totalEfectivo = 0;
 let totalTarjeta = 0;
 
-function calcularCambio() {
+async function calcularCambio() {
     const hamaca = document.getElementById('hamaca').value;
     const totalSelect = parseFloat(document.getElementById('totalSelect').value);
     const totalManual = parseFloat(document.getElementById('totalManual').value);
@@ -849,191 +710,360 @@ function calcularCambio() {
     const cambio = recibido - total;
     document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
 
-    const historial = document.getElementById('historial');
-    const li = document.createElement('li');
+    try {
+        // Guardar en Firebase
+        const operationData = {
+            fecha: serverTimestamp(),
+            hamaca: hamaca || "-",
+            total: total.toFixed(2),
+            recibido: recibido.toFixed(2),
+            cambio: cambio.toFixed(2),
+            metodo,
+            tipo: 'venta'
+        };
 
-    const fechaObj = new Date();
-    const dia = String(fechaObj.getDate()).padStart(2, '0');
-    const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
-    const anio = fechaObj.getFullYear();
-    const horas = String(fechaObj.getHours()).padStart(2, '0');
-    const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
-    const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
+        await addDoc(collection(db, 'operations'), operationData);
 
-    li.textContent = `Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Recibido: €${recibido.toFixed(2)} - Cambio: €${cambio.toFixed(2)} - Método: ${metodo} - ${fecha}`;
-    historial.insertBefore(li, historial.firstChild);
+        // Actualizar el historial en la UI
+        const historial = document.getElementById('historial');
+        const li = document.createElement('li');
+        li.textContent = `Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Recibido: €${recibido.toFixed(2)} - Cambio: €${cambio.toFixed(2)} - Método: ${metodo} - ${new Date().toLocaleString()}`;
+        historial.insertBefore(li, historial.firstChild);
 
-    if (metodo === 'efectivo') {
-        totalEfectivo += total;
-    } else {
-        totalTarjeta += total;
+        // Actualizar totales
+        if (metodo === 'efectivo') {
+            totalEfectivo += total;
+        } else {
+            totalTarjeta += total;
+        }
+
+        document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
+        document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
+        document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
+    } catch (error) {
+        console.error("Error al guardar la operación:", error);
+        alert("Error al guardar la operación. Por favor, inténtalo de nuevo.");
     }
-
-    document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
-    document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
-    document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
-
-    // Guardar en localStorage
-    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-    datosHistorial.push({
-        fecha,
-        hamaca: hamaca || "-",
-        total: total.toFixed(2),
-        recibido: recibido.toFixed(2),
-        cambio: cambio.toFixed(2),
-        metodo
-    });
-    localStorage.setItem("historial", JSON.stringify(datosHistorial));
-
-    let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-    operaciones.push({
-        fecha,
-        hamaca: hamaca || "-",
-        pagado: total.toFixed(2),
-        devuelto: ""
-    });
-    localStorage.setItem("operaciones", JSON.stringify(operaciones));
-
-    // Sincronizar con Firebase
-    calculatorRef.doc('transactions').collection('history').add({
-        fecha,
-        hamaca: hamaca || "-",
-        total: total.toFixed(2),
-        recibido: recibido.toFixed(2),
-        cambio: cambio.toFixed(2),
-        metodo,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    calculatorRef.doc('totals').set({
-        totalEfectivo: totalEfectivo,
-        totalTarjeta: totalTarjeta,
-        totalGeneral: totalEfectivo + totalTarjeta,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
 }
 
 function procesarDevolucion() {
-    const hamaca = document.getElementById('hamaca').value;
-    const totalSelect = parseFloat(document.getElementById('totalSelect').value);
-    const totalManual = parseFloat(document.getElementById('totalManual').value);
-    const metodo = document.getElementById('pago').value;
+  const hamaca = document.getElementById('hamaca').value;
+  const totalSelect = parseFloat(document.getElementById('totalSelect').value);
+  const totalManual = parseFloat(document.getElementById('totalManual').value);
+  const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value);
+  const recibidoManual = parseFloat(document.getElementById('recibidoManual').value);
+  const metodo = document.getElementById('pago').value;
 
-    const total = totalManual || totalSelect;
+  // Usamos el total como el valor de lo que se debe devolver
+  const total = totalManual || totalSelect;
 
-    if (isNaN(total)) {
-        alert("Por favor, introduce un monto válido.");
-        return;
-    }
+  if (isNaN(total)) {
+    alert("Por favor, introduce un monto válido.");
+    return;
+  }
 
-    const devolucion = total;
-    document.getElementById('resultado').textContent = `Devolución: €${devolucion.toFixed(2)}`;
+  // La devolución será simplemente el total (es decir, se debe devolver todo el monto)
+  const devolucion = total;
 
-    const historial = document.getElementById('historial');
-    const li = document.createElement('li');
+  // Mostramos el monto de la devolución
+  document.getElementById('resultado').textContent = `Devolución: €${devolucion.toFixed(2)}`;
 
-    const fechaObj = new Date();
-    const dia = String(fechaObj.getDate()).padStart(2, '0');
-    const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
-    const anio = fechaObj.getFullYear();
-    const horas = String(fechaObj.getHours()).padStart(2, '0');
-    const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
-    const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
+  const historial = document.getElementById('historial');
+  const li = document.createElement('li');
 
-    li.textContent = `Devolución Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Devolución: €${devolucion.toFixed(2)} - Método: ${metodo} - ${fecha}`;
-    historial.insertBefore(li, historial.firstChild);
+  // Fecha y hora del registro
+  const fechaObj = new Date();
+  const dia = String(fechaObj.getDate()).padStart(2, '0');
+  const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+  const anio = fechaObj.getFullYear();
+  const horas = String(fechaObj.getHours()).padStart(2, '0');
+  const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
+  const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
 
-    if (metodo === 'efectivo') {
-        totalEfectivo -= total;
-    } else {
-        totalTarjeta -= total;
-    }
+  // Creamos el elemento de historial
+  li.textContent = `Devolución Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Devolución: €${devolucion.toFixed(2)} - Método: ${metodo} - ${fecha}`;
+  historial.insertBefore(li, historial.firstChild);
 
-    document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
-    document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
-    document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
+  // Actualizamos los totales de efectivo o tarjeta según el método de pago
+  if (metodo === 'efectivo') {
+    totalEfectivo -= total;  // Restamos el total para reflejar la devolución
+  } else {
+    totalTarjeta -= total;  // Restamos el total para reflejar la devolución
+  }
 
-    // Guardar en localStorage
-    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-    datosHistorial.push({
-        fecha,
-        hamaca: hamaca || "-",
-        total: total.toFixed(2),
-        devolucion: devolucion.toFixed(2),
-        metodo
-    });
-    localStorage.setItem("historial", JSON.stringify(datosHistorial));
+  // Actualizamos el total en pantalla
+  document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
+  document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
+  document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-    let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-    operaciones.push({
-        fecha,
-        hamaca: hamaca || "-",
-        pagado: "",
-        devuelto: devolucion.toFixed(2)
-    });
-    localStorage.setItem("operaciones", JSON.stringify(operaciones));
+  // Guardamos el historial en Firebase
+  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+  datosHistorial.push({
+    fecha,
+    hamaca: hamaca || "-",
+    total: total.toFixed(2),
+    devolucion: devolucion.toFixed(2),
+    metodo
+  });
+  localStorage.setItem("historial", JSON.stringify(datosHistorial));
 
-    // Sincronizar con Firebase
-    calculatorRef.doc('transactions').collection('history').add({
-        fecha,
-        hamaca: hamaca || "-",
-        total: total.toFixed(2),
-        devolucion: devolucion.toFixed(2),
-        metodo,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    calculatorRef.doc('totals').set({
-        totalEfectivo: totalEfectivo,
-        totalTarjeta: totalTarjeta,
-        totalGeneral: totalEfectivo + totalTarjeta,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-}
-
-function reiniciarCalculadora() {
-    document.getElementById('hamaca').value = '';
-    document.getElementById('totalSelect').selectedIndex = 0;
-    document.getElementById('totalManual').value = '';
-    document.getElementById('recibidoSelect').selectedIndex = 0;
-    document.getElementById('recibidoManual').value = '';
-    document.getElementById('pago').selectedIndex = 0;
-    document.getElementById('resultado').textContent = '';
-
-    totalEfectivo = 0;
-    totalTarjeta = 0;
-
-    document.getElementById('totalEfectivo').textContent = '0.00';
-    document.getElementById('totalTarjeta').textContent = '0.00';
-    document.getElementById('totalGeneral').textContent = '0.00';
-
-    const historial = document.getElementById('historial');
-    historial.innerHTML = '';
-
-    localStorage.removeItem('historial');
-
-    // Sincronizar con Firebase
-    calculatorRef.doc('totals').set({
-        totalEfectivo: 0,
-        totalTarjeta: 0,
-        totalGeneral: 0,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    });
+  // Guardamos la operación de la devolución en el historial de operaciones
+  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+  operaciones.push({
+    fecha,
+    hamaca: hamaca || "-",
+    pagado: "",
+    devuelto: devolucion.toFixed(2)
+  });
+  localStorage.setItem("operaciones", JSON.stringify(operaciones));
 }
 
 function toggleHistorial() {
-    const historialContainer = document.getElementById('historialContainer');
-    historialContainer.style.display = historialContainer.style.display === 'none' ? 'block' : 'none';
+  const historialContainer = document.getElementById('historialContainer');
+  historialContainer.style.display = historialContainer.style.display === 'none' ? 'block' : 'none';
 }
 
-function descargarHistorial() {
-    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+async function descargarHistorial() {
+    try {
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 1); // Último mes
 
-    const resumenDiario = {};
-    const resumenMensual = {};
+        const operationsQuery = query(
+            collection(db, 'operations'),
+            where('fecha', '>=', startDate),
+            orderBy('fecha', 'desc')
+        );
 
-    datosHistorial.forEach(entry => {
-        // Manejo correcto para fechas en formato DD/MM/YYYY
-        let [dia, mes, anioHora] = entry.fecha.split('/');
-        let [anio] = anioHora.split(' ');
-        let fecha = new Date(`${anio}-${mes}-${dia}`);
+        const querySnapshot = await getDocs(operationsQuery);
+        const resumenDiario = {};
+        const resumenMensual = {};
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const fecha = data.fecha.toDate();
+            const diaClave = `${String(fecha.getDate()).padStart(2, '0')}/${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
+            const mesClave = `${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
+            const total = parseFloat(data.total || 0);
+            const metodo = data.metodo;
+
+            if (!resumenDiario[diaClave]) {
+                resumenDiario[diaClave] = { efectivo: 0, tarjeta: 0 };
+            }
+            if (!resumenMensual[mesClave]) {
+                resumenMensual[mesClave] = { efectivo: 0, tarjeta: 0 };
+            }
+
+            if (metodo === 'efectivo') {
+                resumenDiario[diaClave].efectivo += total;
+                resumenMensual[mesClave].efectivo += total;
+            } else {
+                resumenDiario[diaClave].tarjeta += total;
+                resumenMensual[mesClave].tarjeta += total;
+            }
+        });
+
+        let csv = "Resumen Diario\nDía,Efectivo,Tarjeta,Total\n";
+        for (let dia in resumenDiario) {
+            const d = resumenDiario[dia];
+            csv += `${dia},${d.efectivo.toFixed(2)},${d.tarjeta.toFixed(2)},${(d.efectivo + d.tarjeta).toFixed(2)}\n`;
+        }
+
+        csv += "\nResumen Mensual\nMes,Efectivo,Tarjeta,Total\n";
+        for (let mes in resumenMensual) {
+            const m = resumenMensual[mes];
+            csv += `${mes},${m.efectivo.toFixed(2)},${m.tarjeta.toFixed(2)},${(m.efectivo + m.tarjeta).toFixed(2)}\n`;
+        }
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "resumen_contabilidad.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error al descargar el historial:", error);
+        alert("Error al descargar el historial. Por favor, inténtalo de nuevo.");
+    }
+}
+
+
+function reiniciarCalculadora() {
+  document.getElementById('hamaca').value = '';
+  document.getElementById('totalSelect').selectedIndex = 0;
+  document.getElementById('totalManual').value = '';
+  document.getElementById('recibidoSelect').selectedIndex = 0;
+  document.getElementById('recibidoManual').value = '';
+  document.getElementById('pago').selectedIndex = 0;
+  document.getElementById('resultado').textContent = '';
+
+  totalEfectivo = 0;
+  totalTarjeta = 0;
+
+  document.getElementById('totalEfectivo').textContent = '0.00';
+  document.getElementById('totalTarjeta').textContent = '0.00';
+  document.getElementById('totalGeneral').textContent = '0.00';
+
+  const historial = document.getElementById('historial');
+  historial.innerHTML = '';
+
+  localStorage.removeItem('historial'); // solo historial, no operaciones
+}
+
+function descargarLog() {
+  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+
+  let csv = "Fecha,Hora,Hamaca,Pagado,Devuelto\n";
+
+  operaciones.forEach(entry => {
+    // Separar la fecha original "DD/MM/YYYY HH:MM"
+    const partes = entry.fecha.split(' ');
+    const fechaTexto = partes[0]; // "DD/MM/YYYY"
+    const horaTexto = partes[1] || ''; // "HH:MM"
+
+    csv += `${fechaTexto},${horaTexto},${entry.hamaca},${entry.pagado},${entry.devuelto}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "log_operaciones_individuales.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+//FUNCIONAMIENTO DE SERVICE WORKER NO TOCAR
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((reg) => {
+      console.log("Service Worker registrado", reg);
+    }).catch((err) => {
+      console.error("Error al registrar el Service Worker", err);
+    });
+  });
+}
+
+// Bucle de colores para los círculos
+
+function setupColorCycle(selector, stepsCount, storagePrefix) {
+    $(selector).each(function (index) {
+        const el = $(this);
+        const sunbedId = el.attr('id');
+
+        el.on('dblclick', async function (event) {
+            event.stopPropagation();
+
+            const currentStep = parseInt(el.data('actual-step')) || 0;
+            const newStep = currentStep >= stepsCount ? 1 : currentStep + 1;
+
+            // Eliminar clases anteriores
+            for (let i = 1; i <= stepsCount; i++) {
+                el.removeClass('step' + i);
+            }
+
+            // Añadir nueva clase
+            el.addClass('step' + newStep);
+            el.data('actual-step', newStep);
+
+            try {
+                // Guardar en Firebase
+                if (selector === '.sunbed') {
+                    await updateDoc(doc(db, 'sunbeds', sunbedId), {
+                        colorStep: newStep
+                    });
+                } else if (selector === '.circle') {
+                    await updateDoc(doc(db, 'sunbeds', sunbedId), {
+                        circleColorStep: newStep
+                    });
+                }
+            } catch (error) {
+                console.error("Error al actualizar el color:", error);
+            }
+        });
+
+        // Restaurar estado desde Firebase
+        sunbedsRef.doc(sunbedId).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                const savedStep = selector === '.sunbed' ? data.colorStep : data.circleColorStep;
+                if (savedStep) {
+                    for (let i = 1; i <= stepsCount; i++) {
+                        el.removeClass('step' + i);
+                    }
+                    el.addClass('step' + savedStep);
+                    el.data('actual-step', savedStep);
+                }
+            }
+        });
+    });
+}
+
+// Aplicamos color cycle separado
+setupColorCycle('.circle', 3, 'circle_color_');
+setupColorCycle('.sunbed', 6, 'sunbed_color_');
+
+//------zona pruebas
+
+// Manejo del menú contextual de colores
+document.addEventListener('DOMContentLoaded', function() {
+    const contextMenu = document.getElementById('colorContextMenu');
+    let activeSunbed = null;
+
+    // Mostrar menú contextual al hacer clic derecho o mantener pulsado
+    document.addEventListener('contextmenu', function(e) {
+        const sunbed = e.target.closest('.sunbed');
+        if (sunbed) {
+            e.preventDefault();
+            activeSunbed = sunbed;
+            contextMenu.style.display = 'block';
+            
+            // Obtener la posición de la sunbed
+            const sunbedRect = sunbed.getBoundingClientRect();
+            
+            // Posicionar el menú justo encima de la sunbed
+            contextMenu.style.left = (sunbedRect.left + window.scrollX) + 'px';
+            contextMenu.style.top = (sunbedRect.top + window.scrollY - contextMenu.offsetHeight - 10) + 'px';
+        }
+    });
+
+    // Cerrar menú al hacer clic en cualquier lugar
+    document.addEventListener('click', function(e) {
+        if (!contextMenu.contains(e.target)) {
+            contextMenu.style.display = 'none';
+        }
+    });
+
+    // Manejar la selección de color
+    contextMenu.addEventListener('click', function(e) {
+        const colorOption = e.target.closest('.color-option');
+        if (colorOption && activeSunbed) {
+            const step = colorOption.dataset.step;
+            
+            // Eliminar clases anteriores
+            for (let i = 1; i <= 6; i++) {
+                activeSunbed.classList.remove('step' + i);
+            }
+            
+            // Añadir nueva clase
+            activeSunbed.classList.add('step' + step);
+            activeSunbed.dataset.actualStep = step;
+            
+            // Guardar en Firebase
+            const sunbedId = activeSunbed.id;
+            sunbedsRef.doc(sunbedId).update({
+                colorStep: step
+            });
+            
+            // Ocultar menú
+            contextMenu.style.display = 'none';
+        }
+    });
+
+    // Cerrar menú al hacer scroll
+    window.addEventListener('scroll', function() {
+        contextMenu.style.display = 'none';
+    });
+});
