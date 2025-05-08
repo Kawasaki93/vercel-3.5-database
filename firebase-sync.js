@@ -18,13 +18,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
+// Función para sanitizar una clave
+function sanitizeKey(key) {
+    return key.replace(/[.#$\/\[\]]/g, '_');
+}
+
+// Función para sanitizar un objeto
+function sanitizeData(data) {
+    if (typeof data !== 'object' || data === null) {
+        return data;
+    }
+
+    if (Array.isArray(data)) {
+        return data.map(item => sanitizeData(item));
+    }
+
+    const sanitized = {};
+    for (const [key, value] of Object.entries(data)) {
+        const sanitizedKey = sanitizeKey(key);
+        sanitized[sanitizedKey] = typeof value === 'object' ? sanitizeData(value) : value;
+    }
+    return sanitized;
+}
+
 // Función para sincronizar un elemento específico con Firebase
 function syncElementToFirebase(key, data) {
     console.log(`Sincronizando ${key} con datos:`, data);
-    const elementRef = ref(database, `app_data/${key}`);
-    return set(elementRef, data)
-        .then(() => console.log(`✅ Datos sincronizados en ${key}`))
-        .catch(error => console.error(`❌ Error al sincronizar ${key}:`, error));
+    const sanitizedKey = sanitizeKey(key);
+    const sanitizedData = sanitizeData(data);
+    const elementRef = ref(database, `app_data/${sanitizedKey}`);
+    return set(elementRef, sanitizedData)
+        .then(() => console.log(`✅ Datos sincronizados en ${sanitizedKey}`))
+        .catch(error => console.error(`❌ Error al sincronizar ${sanitizedKey}:`, error));
 }
 
 // Función para sincronizar todo el localStorage con Firebase
@@ -65,10 +90,11 @@ function loadFromFirebase() {
         if (data) {
             Object.keys(data).forEach(key => {
                 try {
-                    if (typeof data[key] === 'object') {
-                        localStorage.setItem(key, JSON.stringify(data[key]));
+                    const value = data[key];
+                    if (typeof value === 'object') {
+                        localStorage.setItem(key, JSON.stringify(value));
                     } else {
-                        localStorage.setItem(key, data[key]);
+                        localStorage.setItem(key, value);
                     }
                 } catch (e) {
                     console.error(`Error al guardar ${key} en localStorage:`, e);

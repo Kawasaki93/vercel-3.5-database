@@ -299,10 +299,10 @@ function toggleDesconectadosFila8() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila8.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila8Visibility", "visible");
+        saveToBoth("desconectadosFila8Visibility", "visible");
     } else {
         $desconectadosFila8.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila8Visibility", "hidden");
+        saveToBoth("desconectadosFila8Visibility", "hidden");
     }
 }
 
@@ -323,10 +323,10 @@ function toggledesconectadosFila4() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila4.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila4Visibility", "visible");
+        saveToBoth("desconectadosFila4Visibility", "visible");
     } else {
         $desconectadosFila4.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila4Visibility", "hidden");
+        saveToBoth("desconectadosFila4Visibility", "hidden");
     }
 }
 
@@ -347,10 +347,10 @@ function toggledesconectadosFila3() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila3.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila3Visibility", "visible");
+        saveToBoth("desconectadosFila3Visibility", "visible");
     } else {
         $desconectadosFila3.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila3Visibility", "hidden");
+        saveToBoth("desconectadosFila3Visibility", "hidden");
     }
 }
 
@@ -371,10 +371,10 @@ function toggledesconectadosFila2() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila2.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila2Visibility", "visible");
+        saveToBoth("desconectadosFila2Visibility", "visible");
     } else {
         $desconectadosFila2.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila2Visibility", "hidden");
+        saveToBoth("desconectadosFila2Visibility", "hidden");
     }
 }
 
@@ -398,10 +398,10 @@ function toggledesconectadosFila1() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila1.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila1Visibility", "visible");
+        saveToBoth("desconectadosFila1Visibility", "visible");
     } else {
         $desconectadosFila1.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila1Visibility", "hidden");
+        saveToBoth("desconectadosFila1Visibility", "hidden");
     }
 }
 
@@ -422,10 +422,10 @@ function toggleDesconectadosFila0() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila0.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila0Visibility", "visible");
+        saveToBoth("desconectadosFila0Visibility", "visible");
     } else {
         $desconectadosFila0.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila0Visibility", "hidden");
+        saveToBoth("desconectadosFila0Visibility", "hidden");
     }
 }
 
@@ -446,10 +446,10 @@ function toggleZonalibre() {
 
     if (currentVisibility === "hidden") {
         $Zonalibre.css("visibility", "visible");
-        localStorage.setItem("ZonalibreVisibility", "visible");
+        saveToBoth("ZonalibreVisibility", "visible");
     } else {
         $Zonalibre.css("visibility", "hidden");
-        localStorage.setItem("ZonalibreVisibility", "hidden");
+        saveToBoth("ZonalibreVisibility", "hidden");
     }
 }
 
@@ -470,10 +470,10 @@ function toggleZonalibre2() {
 
     if (currentVisibility === "hidden") {
         $Zonalibre2.css("visibility", "visible");
-        localStorage.setItem("Zonalibre2Visibility", "visible");
+        saveToBoth("Zonalibre2Visibility", "visible");
     } else {
         $Zonalibre2.css("visibility", "hidden");
-        localStorage.setItem("Zonalibre2Visibility", "hidden");
+        saveToBoth("Zonalibre2Visibility", "hidden");
     }
 }
 
@@ -495,10 +495,10 @@ function toggleclon10A() {
 
     if (currentVisibility === "hidden") {
         $clon10A.css("visibility", "visible");
-        localStorage.setItem("clon10AVisibility", "visible");
+        saveToBoth("clon10AVisibility", "visible");
     } else {
         $clon10A.css("visibility", "hidden");
-        localStorage.setItem("clon10AVisibility", "hidden");
+        saveToBoth("clon10AVisibility", "hidden");
     }
 }
 
@@ -519,10 +519,10 @@ function toggleclon0() {
 
     if (currentVisibility === "hidden") {
         $clon0.css("visibility", "visible");
-        localStorage.setItem("clon0Visibility", "visible");
+        saveToBoth("clon0Visibility", "visible");
     } else {
         $clon0.css("visibility", "hidden");
-        localStorage.setItem("clon0Visibility", "hidden");
+        saveToBoth("clon0Visibility", "hidden");
     }
 }
 
@@ -593,12 +593,12 @@ var SunbedController = function() {
                 var text = $(this).val();
                 var target_id = $(this).closest(".sunbed").attr('id');
                 let target_key = 'customer_name' + target_id;
-                localStorage.setItem(target_key, text);
+                saveToBoth(target_key, text);
             });
 
             $("#comments").keyup(function() {
                let actual_value = $(this).val();
-               localStorage.setItem('comments', actual_value);
+               saveToBoth('comments', actual_value);
             });
 
           
@@ -662,6 +662,9 @@ var SunbedController = function() {
             !local_key.includes('Visibility')
         ) {
             localStorage.removeItem(local_key);
+            if (window.syncElementToFirebase) {
+                window.syncElementToFirebase(local_key, null);
+            }
         }
     });
 
@@ -743,25 +746,7 @@ function calcularCambio() {
   document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
   document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-  datosHistorial.push({
-    fecha,
-    hamaca: hamaca || "-",
-    total: total.toFixed(2),
-    recibido: recibido.toFixed(2),
-    cambio: cambio.toFixed(2),
-    metodo
-  });
-  localStorage.setItem("historial", JSON.stringify(datosHistorial));
-
-  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-  operaciones.push({
-    fecha,
-    hamaca: hamaca || "-",
-    pagado: total.toFixed(2),
-    devuelto: ""
-  });
-  localStorage.setItem("operaciones", JSON.stringify(operaciones));
+  guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo);
 }
 
 function procesarDevolucion() {
@@ -815,25 +800,7 @@ function procesarDevolucion() {
   document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
   // Guardamos el historial en localStorage
-  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-  datosHistorial.push({
-    fecha,
-    hamaca: hamaca || "-",
-    total: total.toFixed(2),
-    devolucion: devolucion.toFixed(2),
-    metodo
-  });
-  localStorage.setItem("historial", JSON.stringify(datosHistorial));
-
-  // Guardamos la operación de la devolución en el historial de operaciones
-  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-  operaciones.push({
-    fecha,
-    hamaca: hamaca || "-",
-    pagado: "",
-    devuelto: devolucion.toFixed(2)
-  });
-  localStorage.setItem("operaciones", JSON.stringify(operaciones));
+  guardarEnHistorial(fecha, hamaca, total, devolucion, devolucion, metodo);
 }
 
 function toggleHistorial() {
@@ -1058,3 +1025,43 @@ document.addEventListener('DOMContentLoaded', function() {
         contextMenu.style.display = 'none';
     });
 });
+
+// Función para guardar en localStorage y Firebase
+function saveToBoth(key, value) {
+    localStorage.setItem(key, value);
+    if (window.syncElementToFirebase) {
+        window.syncElementToFirebase(key, value);
+    }
+}
+
+// Función para guardar JSON en localStorage y Firebase
+function saveJSONToBoth(key, value) {
+    const jsonValue = JSON.stringify(value);
+    localStorage.setItem(key, jsonValue);
+    if (window.syncElementToFirebase) {
+        window.syncElementToFirebase(key, value);
+    }
+}
+
+// Modificar la función que guarda el historial
+function guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo) {
+    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+    datosHistorial.push({
+        fecha,
+        hamaca: hamaca || "-",
+        total: total.toFixed(2),
+        recibido: recibido.toFixed(2),
+        cambio: cambio.toFixed(2),
+        metodo
+    });
+    saveJSONToBoth("historial", datosHistorial);
+
+    let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+    operaciones.push({
+        fecha,
+        hamaca: hamaca || "-",
+        pagado: total.toFixed(2),
+        devuelto: ""
+    });
+    saveJSONToBoth("operaciones", operaciones);
+}
