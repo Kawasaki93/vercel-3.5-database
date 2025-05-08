@@ -205,13 +205,13 @@ function loadFromFirebase() {
 function updateSunbedColor(sunbed, step) {
     console.log(`Actualizando color de hamaca ${sunbed.attr('id')} con paso ${step}`);
     const colors = {
-        0: '#ffffff',
-        1: '#ff0000',
-        2: '#00ff00',
-        3: '#0000ff',
-        4: '#ffff00',
-        5: '#ff00ff',
-        6: '#00ffff'
+        0: '#ffffff', // blanco por defecto
+        1: 'LightSeaGreen',
+        2: 'red',
+        3: 'orange',
+        4: 'green',
+        5: 'LightSeaGreen',
+        6: 'red'
     };
     const color = colors[step] || '#ffffff';
     console.log(`Color aplicado: ${color}`);
