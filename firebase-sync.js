@@ -60,7 +60,7 @@ function testFirebaseConnection() {
 function syncElementToFirebase(path, data) {
     console.log(`Sincronizando ${path} con datos:`, data);
     const elementRef = ref(database, path);
-    set(elementRef, data)
+    return set(elementRef, data)
         .then(() => console.log(`✅ Datos sincronizados en ${path}`))
         .catch(error => console.error(`❌ Error al sincronizar ${path}:`, error));
 }
@@ -279,13 +279,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Escuchar cambios en los colores de las hamacas
-    $(document).on('click', '.sunbed', function() {
+    $(document).on('click', '.sunbed', function(e) {
+        e.preventDefault();
         const id = $(this).attr('id');
-        const step = $(this).attr('data-step');
-        console.log(`Cambio en color de hamaca ${id}: ${step}`);
+        const currentStep = $(this).attr('data-step') || '0';
+        const nextStep = (parseInt(currentStep) + 1) % 7;
+        console.log(`Cambio en color de hamaca ${id}: de ${currentStep} a ${nextStep}`);
+        $(this).attr('data-step', nextStep);
         const key = 'sunbed_color' + id;
-        localStorage.setItem(key, step);
-        syncElementToFirebase(`sunbeds/${id}`, { step: step });
+        localStorage.setItem(key, nextStep);
+        updateSunbedColor($(this), nextStep);
+        syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
     });
 
     // Escuchar cambios en la visibilidad de filas
@@ -315,4 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('total_sold', JSON.stringify(totals));
         syncElementToFirebase('totals', totals);
     };
+
+    // Forzar una sincronización inicial
+    syncWithFirebase();
 }); 
