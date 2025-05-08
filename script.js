@@ -692,25 +692,30 @@ let totalEfectivo = 0;
 let totalTarjeta = 0;
 
 async function calcularCambio() {
-    const hamaca = document.getElementById('hamaca').value;
-    const totalSelect = parseFloat(document.getElementById('totalSelect').value);
-    const totalManual = parseFloat(document.getElementById('totalManual').value);
-    const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value);
-    const recibidoManual = parseFloat(document.getElementById('recibidoManual').value);
-    const metodo = document.getElementById('pago').value;
-
-    const total = totalManual || totalSelect;
-    const recibido = recibidoManual || recibidoSelect;
-
-    if (isNaN(total) || isNaN(recibido)) {
-        alert("Por favor, introduce montos válidos.");
-        return;
-    }
-
-    const cambio = recibido - total;
-    document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
-
     try {
+        const hamaca = document.getElementById('hamaca').value;
+        const totalSelect = parseFloat(document.getElementById('totalSelect').value) || 0;
+        const totalManual = parseFloat(document.getElementById('totalManual').value) || 0;
+        const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value) || 0;
+        const recibidoManual = parseFloat(document.getElementById('recibidoManual').value) || 0;
+        const metodo = document.getElementById('pago').value;
+
+        const total = totalManual || totalSelect;
+        const recibido = recibidoManual || recibidoSelect;
+
+        if (isNaN(total) || isNaN(recibido)) {
+            alert("Por favor, introduce montos válidos.");
+            return;
+        }
+
+        if (recibido < total) {
+            alert("El monto recibido debe ser mayor o igual al total a pagar.");
+            return;
+        }
+
+        const cambio = recibido - total;
+        document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
+
         // Guardar en Firebase
         const operationData = {
             fecha: serverTimestamp(),
@@ -740,6 +745,15 @@ async function calcularCambio() {
         document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
         document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
         document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
+
+        // Limpiar campos después de la operación
+        document.getElementById('hamaca').value = '';
+        document.getElementById('totalSelect').selectedIndex = 0;
+        document.getElementById('totalManual').value = '';
+        document.getElementById('recibidoSelect').selectedIndex = 0;
+        document.getElementById('recibidoManual').value = '';
+        document.getElementById('pago').selectedIndex = 0;
+
     } catch (error) {
         console.error("Error al guardar la operación:", error);
         alert("Error al guardar la operación. Por favor, inténtalo de nuevo.");
@@ -953,6 +967,10 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
         const el = $(this);
         const sunbedId = el.attr('id');
 
+        // Mantener la visibilidad original
+        const originalDisplay = el.css('display');
+        el.css('display', originalDisplay);
+
         el.on('dblclick', async function (event) {
             event.stopPropagation();
 
@@ -981,21 +999,6 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
                 }
             } catch (error) {
                 console.error("Error al actualizar el color:", error);
-            }
-        });
-
-        // Restaurar estado desde Firebase
-        sunbedsRef.doc(sunbedId).get().then((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                const savedStep = selector === '.sunbed' ? data.colorStep : data.circleColorStep;
-                if (savedStep) {
-                    for (let i = 1; i <= stepsCount; i++) {
-                        el.removeClass('step' + i);
-                    }
-                    el.addClass('step' + savedStep);
-                    el.data('actual-step', savedStep);
-                }
             }
         });
     });
@@ -1066,4 +1069,32 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', function() {
         contextMenu.style.display = 'none';
     });
+});
+
+// Asegurar que las sunbeds sean visibles al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Restaurar visibilidad de las sunbeds
+    $('.sunbed').each(function() {
+        const el = $(this);
+        if (!el.hasClass('desconectadosgeneral') && 
+            !el.hasClass('desconectadosFila0') && 
+            !el.hasClass('desconectadosFila1') && 
+            !el.hasClass('desconectadosFila2') && 
+            !el.hasClass('desconectadosFila3') && 
+            !el.hasClass('desconectadosFila4') && 
+            !el.hasClass('desconectadosfila8') && 
+            !el.hasClass('Zonalibre') && 
+            !el.hasClass('Zonalibre2') && 
+            !el.hasClass('clon10A') && 
+            !el.hasClass('clon0')) {
+            el.css('visibility', 'visible');
+        }
+    });
+
+    // Inicializar la calculadora
+    totalEfectivo = 0;
+    totalTarjeta = 0;
+    document.getElementById('totalEfectivo').textContent = '0.00';
+    document.getElementById('totalTarjeta').textContent = '0.00';
+    document.getElementById('totalGeneral').textContent = '0.00';
 });

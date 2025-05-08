@@ -73,7 +73,8 @@ body {
   margin-top: 15px;
   position: relative;
   font-weight: 750; /* Equivale a bold */
-  user-select:none;
+  user-select: none;
+  visibility: visible; /* Asegurar visibilidad por defecto */
 }
 
 .circle {
@@ -166,21 +167,20 @@ body {
   
 }
 /*GRUPOS DE HAMACAS------------- */
-.desconectadosgeneral {
+.desconectadosgeneral,
+.desconectadosFila0,
+.desconectadosFila1,
+.desconectadosFila2,
+.desconectadosFila3,
+.desconectadosFila4,
+.desconectadosfila8,
+.Zonalibre,
+.Zonalibre2,
+.clon10A,
+.clon0 {
   visibility: hidden;
 }
-.desconectadosfila1 {
-  visibility: hidden;
-}
-.desconectadosfila2 {
-  visibility: hidden;
-}
-.desconectadosfila3 {
-  visibility: hidden;
-}
-.desconectadosfila4 {
-  visibility: hidden;
-}
+
 .desconectadosfila5 {
   visibility: hidden;
 }
@@ -593,16 +593,14 @@ input, textarea {
 
 /* Estilo mejorado sin alterar la posición original */
 .calculator-footer {
-  width: 600%;
-  background-color: #ffffff;
-  padding-bottom: 2000px;
-  padding-left:100px;
-  padding-right:100px;
-  margin-top: 1200px;
-  margin-left: 500px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-radius: 80px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
 
 .calculator-footer h2 {
@@ -620,28 +618,30 @@ input, textarea {
 
 .calculator-footer input,
 .calculator-footer select {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  font-size: 40px;
+  margin: 5px;
+  padding: 5px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
+  border-radius: 4px;
 }
 
 .calculator-footer button {
-  padding: 14px 24px;
-  background-color: #4caf50;
+  margin: 5px;
+  padding: 8px 15px;
+  background: #4CAF50;
   color: white;
-  font-size: 30px;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s ease;
 }
 
 .calculator-footer button:hover {
-  background-color: #388e3c;
+  background: #45a049;
+}
+
+#resultado {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
 }
 
 .cambio {
