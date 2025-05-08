@@ -13,10 +13,13 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    
     window.initializeFirebase = function(config) {
-      console.log('Inicializando Firebase con config:', config);
+      console.log('Inicializando Firebase...');
       const app = initializeApp(config);
-      return getDatabase(app);
+      const database = getDatabase(app);
+      window.firebaseDatabase = database;
+      return database;
     };
   </script>
   <!-- Estilos personalizados -->
