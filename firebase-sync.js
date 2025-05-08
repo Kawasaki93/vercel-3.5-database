@@ -212,9 +212,12 @@ function updateSunbedColor(sunbed, step) {
         5: 'LightSeaGreen',
         6: 'red'
     };
-    const color = colors[step] || 'LightSeaGreen'; // Volvemos a LightSeaGreen como color por defecto
+    const color = colors[step] || 'LightSeaGreen';
     console.log(`Color aplicado: ${color}`);
     sunbed.css('background-color', color);
+    // Añadir la clase correspondiente
+    sunbed.removeClass('step1 step2 step3 step4 step5 step6');
+    sunbed.addClass(`step${step}`);
 }
 
 // Función para actualizar la visibilidad de una fila
