@@ -205,7 +205,6 @@ function loadFromFirebase() {
 function updateSunbedColor(sunbed, step) {
     console.log(`Actualizando color de hamaca ${sunbed.attr('id')} con paso ${step}`);
     const colors = {
-        0: '#ffffff', // blanco por defecto
         1: 'LightSeaGreen',
         2: 'red',
         3: 'orange',
@@ -213,7 +212,7 @@ function updateSunbedColor(sunbed, step) {
         5: 'LightSeaGreen',
         6: 'red'
     };
-    const color = colors[step] || '#ffffff';
+    const color = colors[step] || 'green'; // Cambiamos el color por defecto a verde
     console.log(`Color aplicado: ${color}`);
     sunbed.css('background-color', color);
 }
@@ -287,12 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const id = $(this).attr('id');
         const currentTime = new Date().getTime();
-        const currentStep = $(this).attr('data-step') || '0';
+        const currentStep = $(this).attr('data-step') || '4'; // Cambiamos el paso inicial a 4 (verde)
         
         // Verificar si es un doble click
         if (currentTime - lastClickTime < 300 && lastClickId === id) {
             // Es un doble click, avanzar dos pasos
-            const nextStep = (parseInt(currentStep) + 2) % 7;
+            const nextStep = ((parseInt(currentStep) + 2) % 6) + 1;
             console.log(`Doble click en hamaca ${id}: de ${currentStep} a ${nextStep}`);
             $(this).attr('data-step', nextStep);
             const key = 'sunbed_color' + id;
@@ -301,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
             syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
         } else {
             // Es un click simple, avanzar un paso
-            const nextStep = (parseInt(currentStep) + 1) % 7;
+            const nextStep = ((parseInt(currentStep) + 1) % 6) + 1;
             console.log(`Click simple en hamaca ${id}: de ${currentStep} a ${nextStep}`);
             $(this).attr('data-step', nextStep);
             const key = 'sunbed_color' + id;
