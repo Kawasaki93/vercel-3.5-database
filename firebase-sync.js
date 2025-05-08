@@ -182,17 +182,32 @@ function updateUIWithLoadedData() {
 function updateSunbedColor(sunbed, step) {
     console.log(`Actualizando color de hamaca ${sunbed.attr('id')} con paso ${step}`);
     
-    // Primero removemos todas las clases de step
+    // Remover todas las clases de step existentes
     sunbed.removeClass('step1 step2 step3 step4 step5 step6');
     
-    // Luego añadimos la clase correspondiente al step actual
-    if (step) {
-        sunbed.addClass(`step${step}`);
-        console.log(`Añadida clase step${step}`);
-    }
+    // Asegurarnos de que el step sea un número válido entre 1 y 6
+    const validStep = Math.max(1, Math.min(6, parseInt(step) || 1));
     
-    // Actualizamos el atributo data-step
-    sunbed.attr('data-step', step);
+    // Añadir la clase correspondiente
+    sunbed.addClass(`step${validStep}`);
+    
+    // Actualizar el atributo data-step
+    sunbed.attr('data-step', validStep);
+    
+    console.log(`Hamaca ${sunbed.attr('id')} actualizada a paso ${validStep}`);
+}
+
+// Función para obtener el color correspondiente a cada paso
+function getColorForStep(step) {
+    const colors = {
+        1: 'LightSeaGreen',
+        2: 'red',
+        3: 'orange',
+        4: 'green',
+        5: 'LightSeaGreen',
+        6: 'red'
+    };
+    return colors[step] || colors[1];
 }
 
 // Función para actualizar la visibilidad de una fila
