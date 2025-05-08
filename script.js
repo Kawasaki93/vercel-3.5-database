@@ -296,14 +296,15 @@ function clearClick(number) {
 function toggleDesconectadosFila8() {
     var $desconectadosFila8 = $(".desconectadosfila8");
     var currentVisibility = $desconectadosFila8.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $desconectadosFila8.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila8Visibility", "visible");
-    } else {
-        $desconectadosFila8.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila8Visibility", "hidden");
-    }
+    $desconectadosFila8.css("visibility", newVisibility);
+    localStorage.setItem("desconectadosFila8Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('desconectadosfila8').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 8-------
@@ -320,14 +321,15 @@ $(document).ready(function() {
 function toggledesconectadosFila4() {
     var $desconectadosFila4 = $(".desconectadosFila4");
     var currentVisibility = $desconectadosFila4.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $desconectadosFila4.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila4Visibility", "visible");
-    } else {
-        $desconectadosFila4.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila4Visibility", "hidden");
-    }
+    $desconectadosFila4.css("visibility", newVisibility);
+    localStorage.setItem("desconectadosFila4Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('desconectadosFila4').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 4-----
@@ -344,14 +346,15 @@ $(document).ready(function() {
 function toggledesconectadosFila3() {
     var $desconectadosFila3 = $(".desconectadosFila3");
     var currentVisibility = $desconectadosFila3.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $desconectadosFila3.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila3Visibility", "visible");
-    } else {
-        $desconectadosFila3.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila3Visibility", "hidden");
-    }
+    $desconectadosFila3.css("visibility", newVisibility);
+    localStorage.setItem("desconectadosFila3Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('desconectadosFila3').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 3-----
@@ -368,14 +371,15 @@ $(document).ready(function() {
 function toggledesconectadosFila2() {
     var $desconectadosFila2 = $(".desconectadosFila2");
     var currentVisibility = $desconectadosFila2.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $desconectadosFila2.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila2Visibility", "visible");
-    } else {
-        $desconectadosFila2.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila2Visibility", "hidden");
-    }
+    $desconectadosFila2.css("visibility", newVisibility);
+    localStorage.setItem("desconectadosFila2Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('desconectadosFila2').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 2-----
@@ -395,14 +399,15 @@ $(document).ready(function() {
 function toggledesconectadosFila1() {
     var $desconectadosFila1 = $(".desconectadosFila1");
     var currentVisibility = $desconectadosFila1.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $desconectadosFila1.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila1Visibility", "visible");
-    } else {
-        $desconectadosFila1.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila1Visibility", "hidden");
-    }
+    $desconectadosFila1.css("visibility", newVisibility);
+    localStorage.setItem("desconectadosFila1Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('desconectadosFila1').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 1-----
@@ -419,14 +424,15 @@ $(document).ready(function() {
 function toggleDesconectadosFila0() {
     var $desconectadosFila0 = $(".desconectadosFila0");
     var currentVisibility = $desconectadosFila0.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $desconectadosFila0.css("visibility", "visible");
-        localStorage.setItem("desconectadosFila0Visibility", "visible");
-    } else {
-        $desconectadosFila0.css("visibility", "hidden");
-        localStorage.setItem("desconectadosFila0Visibility", "hidden");
-    }
+    $desconectadosFila0.css("visibility", newVisibility);
+    localStorage.setItem("desconectadosFila0Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('desconectadosFila0').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de FILA 0------
@@ -443,14 +449,15 @@ $(document).ready(function() {
 function toggleZonalibre() {
     var $Zonalibre = $(".Zonalibre");
     var currentVisibility = $Zonalibre.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $Zonalibre.css("visibility", "visible");
-        localStorage.setItem("ZonalibreVisibility", "visible");
-    } else {
-        $Zonalibre.css("visibility", "hidden");
-        localStorage.setItem("ZonalibreVisibility", "hidden");
-    }
+    $Zonalibre.css("visibility", newVisibility);
+    localStorage.setItem("ZonalibreVisibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('Zonalibre').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de ZONA LIBRE 1----
@@ -467,14 +474,15 @@ $(document).ready(function() {
 function toggleZonalibre2() {
     var $Zonalibre2 = $(".Zonalibre2");
     var currentVisibility = $Zonalibre2.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $Zonalibre2.css("visibility", "visible");
-        localStorage.setItem("Zonalibre2Visibility", "visible");
-    } else {
-        $Zonalibre2.css("visibility", "hidden");
-        localStorage.setItem("Zonalibre2Visibility", "hidden");
-    }
+    $Zonalibre2.css("visibility", newVisibility);
+    localStorage.setItem("Zonalibre2Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('Zonalibre2').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad de ZONA LIBRE 2----
@@ -492,14 +500,15 @@ $(document).ready(function() {
 function toggleclon10A() {
     var $clon10A = $(".clon10A");
     var currentVisibility = $clon10A.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $clon10A.css("visibility", "visible");
-        localStorage.setItem("clon10AVisibility", "visible");
-    } else {
-        $clon10A.css("visibility", "hidden");
-        localStorage.setItem("clon10AVisibility", "hidden");
-    }
+    $clon10A.css("visibility", newVisibility);
+    localStorage.setItem("clon10AVisibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('clon10A').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad del CLON 10A----
@@ -516,14 +525,15 @@ $(document).ready(function() {
 function toggleclon0() {
     var $clon0 = $(".clon0");
     var currentVisibility = $clon0.css("visibility");
+    var newVisibility = currentVisibility === "hidden" ? "visible" : "hidden";
 
-    if (currentVisibility === "hidden") {
-        $clon0.css("visibility", "visible");
-        localStorage.setItem("clon0Visibility", "visible");
-    } else {
-        $clon0.css("visibility", "hidden");
-        localStorage.setItem("clon0Visibility", "hidden");
-    }
+    $clon0.css("visibility", newVisibility);
+    localStorage.setItem("clon0Visibility", newVisibility);
+    
+    // Sincronizar con Firebase
+    db.collection('visibility').doc('clon0').set({
+        visible: newVisibility === "visible"
+    });
 }
 
 // Al cargar la página, restaurar el estado de visibilidad del CLON 0----
@@ -581,28 +591,106 @@ var SunbedController = function() {
     return {
         init: function() {
             this.bind_listeners();
+            this.setupFirebaseListeners();
             this.restore_customers_name();
             this.restore_sunbeds_colors();
+            this.restore_circles_colors();
             this.retreive_prices();
             this.restore_comments();
             this.restore_total_sold();
+            this.restore_visibility();
+        },
+
+        setupFirebaseListeners: function() {
+            // Escuchar cambios en las hamacas
+            sunbedsRef.onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data();
+                    const sunbedId = change.doc.id;
+                    
+                    if (change.type === "modified") {
+                        // Actualizar color
+                        if (data.color) {
+                            $(`#${sunbedId}`).removeClass().addClass('sunbed step' + data.color);
+                            $(`#${sunbedId}`).data('actual-step', data.color);
+                        }
+                        
+                        // Actualizar nombre del cliente
+                        if (data.customerName) {
+                            $(`#${sunbedId} input.customer_name`).val(data.customerName);
+                        }
+                    }
+                });
+            });
+
+            // Escuchar cambios en la calculadora
+            calculatorRef.onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data();
+                    if (change.type === "modified") {
+                        totalEfectivo = data.totalEfectivo || 0;
+                        totalTarjeta = data.totalTarjeta || 0;
+                        this.update_prices();
+                    }
+                });
+            });
+
+            // Escuchar cambios en la visibilidad
+            db.collection('visibility').onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data();
+                    const section = change.doc.id;
+                    
+                    if (data.visible !== undefined) {
+                        $(`.${section}`).css("visibility", data.visible ? "visible" : "hidden");
+                    }
+                });
+            });
+
+            // Escuchar cambios en los círculos
+            db.collection('circles').onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data();
+                    const circleId = change.doc.id;
+                    
+                    if (change.type === "modified" || change.type === "added") {
+                        const circle = $(`#${circleId}`);
+                        if (circle.length) {
+                            // Eliminar clases anteriores
+                            for (let i = 0; i < 3; i++) {
+                                circle.removeClass('step' + i);
+                            }
+                            // Añadir nueva clase
+                            circle.addClass('step' + data.color);
+                            circle.data('actual-step', data.color);
+                        }
+                    }
+                });
+            });
         },
 
         bind_listeners: function() {
             $("input.customer_name").keyup(function () {
                 var text = $(this).val();
                 var target_id = $(this).closest(".sunbed").attr('id');
+                
+                // Guardar en localStorage
                 let target_key = 'customer_name' + target_id;
                 localStorage.setItem(target_key, text);
+                
+                // Sincronizar con Firebase
+                sunbedsRef.doc(target_id).update({
+                    customerName: text
+                });
             });
 
             $("#comments").keyup(function() {
-               let actual_value = $(this).val();
-               localStorage.setItem('comments', actual_value);
+                let actual_value = $(this).val();
+                localStorage.setItem('comments', actual_value);
+                calculatorRef.doc('comments').set({
+                    text: actual_value
+                });
             });
-
-          
-            
         },
 
         restore_customers_name: function() {
@@ -632,6 +720,27 @@ var SunbedController = function() {
             });
         },
 
+        restore_circles_colors: function() {
+            // Restaurar colores de círculos desde Firebase
+            db.collection('circles').get().then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const circleId = doc.id;
+                    const circle = $(`#${circleId}`);
+                    
+                    if (circle.length) {
+                        // Eliminar clases anteriores
+                        for (let i = 0; i < 3; i++) {
+                            circle.removeClass('step' + i);
+                        }
+                        // Añadir nueva clase
+                        circle.addClass('step' + data.color);
+                        circle.data('actual-step', data.color);
+                    }
+                });
+            });
+        },
+
         retreive_prices: function() {
             shopping_cart = 0;
             total_sold = 0;
@@ -652,6 +761,14 @@ var SunbedController = function() {
         update_prices: function() {
             $("#shopping_cat_value").html(shopping_cart);
             $("#total_price_value").html(total_sold);
+            
+            // Sincronizar con Firebase
+            calculatorRef.doc('totals').set({
+                shoppingCart: shopping_cart,
+                totalSold: total_sold,
+                totalEfectivo: totalEfectivo,
+                totalTarjeta: totalTarjeta
+            });
         },
 
         reset_local_storage_except_customers: function () {           
@@ -681,6 +798,19 @@ var SunbedController = function() {
         restore_total_sold: function(){
             localStorage.getItem(total_sold);
             localStorage.removeItem(total_sold);
+        },
+
+        restore_visibility: function() {
+            // Restaurar visibilidad desde Firebase
+            db.collection('visibility').get().then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const section = doc.id;
+                    if (data.visible !== undefined) {
+                        $(`.${section}`).css("visibility", data.visible ? "visible" : "hidden");
+                    }
+                });
+            });
         }
     };
 }();
@@ -762,6 +892,21 @@ function calcularCambio() {
     devuelto: ""
   });
   localStorage.setItem("operaciones", JSON.stringify(operaciones));
+
+  // Sincronizar con Firebase
+  calculatorRef.doc('transactions').collection('history').add({
+    fecha,
+    hamaca: hamaca || "-",
+    total: total.toFixed(2),
+    recibido: recibido.toFixed(2),
+    cambio: cambio.toFixed(2),
+    metodo
+  });
+
+  calculatorRef.doc('totals').update({
+    totalEfectivo: totalEfectivo,
+    totalTarjeta: totalTarjeta
+  });
 }
 
 function procesarDevolucion() {
@@ -962,38 +1107,31 @@ if ('serviceWorker' in navigator) {
 // Bucle de colores para los círculos
 
 
-function setupColorCycle(selector, stepsCount, storagePrefix) {
-    $(selector).each(function (index) {
-        const el = $(this);
-        const storageKey = storagePrefix + index;
-
-        el.on('dblclick', function (event) {
-            event.stopPropagation();
-
-            const currentStep = parseInt(el.data('actual-step')) || 0;
-            const newStep = currentStep >= stepsCount ? 1 : currentStep + 1;
-
-            // Eliminar clases anteriores
-            for (let i = 1; i <= stepsCount; i++) {
-                el.removeClass('step' + i);
-            }
-
-            // Añadir nueva clase
-            el.addClass('step' + newStep);
-            el.data('actual-step', newStep);
-
-            // Guardar en localStorage
-            localStorage.setItem(storageKey, newStep);
-        });
-
-        // Restaurar estado desde localStorage
-        const savedStep = localStorage.getItem(storageKey);
-        if (savedStep) {
-            for (let i = 1; i <= stepsCount; i++) {
-                el.removeClass('step' + i);
-            }
-            el.addClass('step' + savedStep);
-            el.data('actual-step', savedStep);
+function setupColorCycle(selector, steps, storage_key) {
+    $(selector).click(function() {
+        let actual_step = $(this).data('actual-step') || 0;
+        actual_step = (actual_step + 1) % steps;
+        
+        $(this).removeClass().addClass(selector.substring(1) + ' step' + actual_step);
+        $(this).data('actual-step', actual_step);
+        
+        let target_id = $(this).attr('id');
+        let target_key = storage_key + target_id;
+        
+        // Guardar en localStorage
+        localStorage.setItem(target_key, actual_step);
+        
+        // Sincronizar con Firebase
+        if (selector === '.circle') {
+            db.collection('circles').doc(target_id).set({
+                color: actual_step,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } else {
+            sunbedsRef.doc(target_id).set({
+                color: actual_step,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
         }
     });
 }
