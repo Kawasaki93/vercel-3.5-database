@@ -91,7 +91,7 @@ function syncWithFirebase() {
     // Sincronizar visibilidad de filas
     for (let i = 0; i <= 8; i++) {
         const isVisible = localStorage.getItem(`fila${i}_visible`);
-        if (isVisible) {
+        if (isVisible !== null) {
             console.log(`Sincronizando fila ${i} con visibilidad ${isVisible}`);
             syncElementToFirebase(`filas/${i}`, { visible: isVisible === 'true' });
         }
@@ -278,18 +278,40 @@ document.addEventListener('DOMContentLoaded', () => {
         syncElementToFirebase(`customers/${id}`, { name: value });
     });
 
+    // Variables para el doble click
+    let lastClickTime = 0;
+    let lastClickId = null;
+
     // Escuchar cambios en los colores de las hamacas
     $(document).on('click', '.sunbed', function(e) {
         e.preventDefault();
         const id = $(this).attr('id');
+        const currentTime = new Date().getTime();
         const currentStep = $(this).attr('data-step') || '0';
-        const nextStep = (parseInt(currentStep) + 1) % 7;
-        console.log(`Cambio en color de hamaca ${id}: de ${currentStep} a ${nextStep}`);
-        $(this).attr('data-step', nextStep);
-        const key = 'sunbed_color' + id;
-        localStorage.setItem(key, nextStep);
-        updateSunbedColor($(this), nextStep);
-        syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
+        
+        // Verificar si es un doble click
+        if (currentTime - lastClickTime < 300 && lastClickId === id) {
+            // Es un doble click, avanzar dos pasos
+            const nextStep = (parseInt(currentStep) + 2) % 7;
+            console.log(`Doble click en hamaca ${id}: de ${currentStep} a ${nextStep}`);
+            $(this).attr('data-step', nextStep);
+            const key = 'sunbed_color' + id;
+            localStorage.setItem(key, nextStep);
+            updateSunbedColor($(this), nextStep);
+            syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
+        } else {
+            // Es un click simple, avanzar un paso
+            const nextStep = (parseInt(currentStep) + 1) % 7;
+            console.log(`Click simple en hamaca ${id}: de ${currentStep} a ${nextStep}`);
+            $(this).attr('data-step', nextStep);
+            const key = 'sunbed_color' + id;
+            localStorage.setItem(key, nextStep);
+            updateSunbedColor($(this), nextStep);
+            syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
+        }
+        
+        lastClickTime = currentTime;
+        lastClickId = id;
     });
 
     // Escuchar cambios en la visibilidad de filas
@@ -300,6 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isVisible = localStorage.getItem(`fila${filaNum}_visible`) !== 'true';
             console.log(`Cambio en visibilidad de fila ${filaNum}: ${isVisible}`);
             localStorage.setItem(`fila${filaNum}_visible`, isVisible);
+            updateFilaVisibility(filaNum, isVisible);
             syncElementToFirebase(`filas/${filaNum}`, { visible: isVisible });
         }
     });
