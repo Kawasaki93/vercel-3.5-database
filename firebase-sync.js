@@ -101,6 +101,37 @@ function loadFromFirebase() {
     });
 }
 
+// Función para probar la conexión con Firebase
+function testFirebaseConnection() {
+    const statusDiv = document.getElementById('firebaseStatus');
+    statusDiv.textContent = 'Probando conexión...';
+    
+    // Intentar escribir un dato de prueba
+    database.ref('test').set({
+        timestamp: new Date().toISOString(),
+        message: 'Test de conexión'
+    })
+    .then(() => {
+        // Si la escritura es exitosa, intentar leer
+        return database.ref('test').once('value');
+    })
+    .then((snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            statusDiv.textContent = '✅ Conexión exitosa!';
+            statusDiv.style.color = 'green';
+            console.log('Datos de prueba:', data);
+        } else {
+            throw new Error('No se pudieron leer los datos');
+        }
+    })
+    .catch((error) => {
+        statusDiv.textContent = '❌ Error de conexión: ' + error.message;
+        statusDiv.style.color = 'red';
+        console.error('Error:', error);
+    });
+}
+
 // Sincronizar cada 5 minutos
 setInterval(syncWithFirebase, 300000);
 
