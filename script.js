@@ -945,11 +945,11 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
             updateElementColor(el, newStep, timestamp);
 
             // Guardar en localStorage y Firebase
-            const data = {
+            const data = sanitizeData({
                 step: newStep,
                 timestamp: timestamp,
                 deviceId: window.deviceId || 'unknown'
-            };
+            });
             saveToBoth(storageKey, JSON.stringify(data));
         });
 
@@ -961,7 +961,7 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
                 updateElementColor(el, data.step, data.timestamp);
             } catch (e) {
                 // Fallback para datos antiguos
-                const savedStep = savedData;
+                const savedStep = parseInt(savedData) || 0;
                 updateElementColor(el, savedStep, 0);
             }
         }
@@ -1008,11 +1008,11 @@ document.addEventListener('DOMContentLoaded', function() {
             updateElementColor($(activeSunbed), step, timestamp);
             
             // Guardar en localStorage y Firebase
-            const data = {
+            const data = sanitizeData({
                 step: step,
                 timestamp: timestamp,
                 deviceId: window.deviceId || 'unknown'
-            };
+            });
             saveToBoth('sunbed_color_' + sunbedId, JSON.stringify(data));
             
             contextMenu.style.display = 'none';
@@ -1064,6 +1064,28 @@ function guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo) {
     saveJSONToBoth("operaciones", operaciones);
 }
 
+// Función para obtener timestamp actual
+function getCurrentTimestamp() {
+    return Date.now();
+}
+
+// Función para validar y sanitizar datos antes de guardar
+function sanitizeData(data) {
+    if (typeof data === 'number' && isNaN(data)) {
+        return 0;
+    }
+    if (typeof data === 'object') {
+        const sanitized = {};
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                sanitized[key] = sanitizeData(data[key]);
+            }
+        }
+        return sanitized;
+    }
+    return data;
+}
+
 // Función para sincronizar colores con Firebase
 function syncColorsToFirebase() {
     const timestamp = getCurrentTimestamp();
@@ -1071,15 +1093,15 @@ function syncColorsToFirebase() {
     $('.sunbed').each(function() {
         const sunbed = $(this);
         const sunbedId = sunbed.attr('id');
-        const currentStep = sunbed.data('actual-step');
-        const lastUpdate = sunbed.data('last-update') || 0;
+        const currentStep = parseInt(sunbed.data('actual-step')) || 0;
+        const lastUpdate = parseInt(sunbed.data('last-update')) || 0;
         
         if (currentStep && timestamp > lastUpdate) {
-            const data = {
+            const data = sanitizeData({
                 step: currentStep,
                 timestamp: timestamp,
                 deviceId: window.deviceId || 'unknown'
-            };
+            });
             saveToBoth('sunbed_color_' + sunbedId, JSON.stringify(data));
             sunbed.data('last-update', timestamp);
         }
@@ -1088,15 +1110,15 @@ function syncColorsToFirebase() {
     $('.circle').each(function() {
         const circle = $(this);
         const circleId = circle.attr('id');
-        const currentStep = circle.data('actual-step');
-        const lastUpdate = circle.data('last-update') || 0;
+        const currentStep = parseInt(circle.data('actual-step')) || 0;
+        const lastUpdate = parseInt(circle.data('last-update')) || 0;
         
         if (currentStep && timestamp > lastUpdate) {
-            const data = {
+            const data = sanitizeData({
                 step: currentStep,
                 timestamp: timestamp,
                 deviceId: window.deviceId || 'unknown'
-            };
+            });
             saveToBoth('circle_color_' + circleId, JSON.stringify(data));
             circle.data('last-update', timestamp);
         }
@@ -1105,9 +1127,10 @@ function syncColorsToFirebase() {
 
 // Función para actualizar el color de un elemento
 function updateElementColor(element, step, timestamp) {
-    const currentUpdate = $(element).data('last-update') || 0;
+    const currentUpdate = parseInt($(element).data('last-update')) || 0;
+    step = parseInt(step) || 0;
     
-    if (timestamp > currentUpdate) {
+    if (timestamp > currentUpdate && step > 0) {
         // Eliminar clases anteriores
         for (let i = 1; i <= 6; i++) {
             $(element).removeClass('step' + i);
