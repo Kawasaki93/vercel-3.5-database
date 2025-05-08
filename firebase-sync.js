@@ -57,8 +57,17 @@ function testFirebaseConnection() {
     });
 }
 
+// Función para sincronizar un elemento específico con Firebase
+function syncElementToFirebase(id, type, value) {
+    console.log(`Sincronizando ${type} ${id} con valor:`, value);
+    const elementRef = ref(database, `${type}/${id}`);
+    set(elementRef, { value: value });
+}
+
 // Función para sincronizar localStorage con Firebase
 function syncWithFirebase() {
+    console.log('Iniciando sincronización completa...');
+    
     // Sincronizar nombres de clientes
     $("input.customer_name").each(function() {
         const id = $(this).closest(".sunbed").attr('id');
@@ -66,10 +75,7 @@ function syncWithFirebase() {
         const value = localStorage.getItem(key);
         
         if (value) {
-            const customerRef = ref(database, 'customers/' + id);
-            set(customerRef, {
-                name: value
-            });
+            syncElementToFirebase(id, 'customers', value);
         }
     });
 
@@ -80,10 +86,7 @@ function syncWithFirebase() {
         const value = localStorage.getItem(key);
         
         if (value) {
-            const sunbedRef = ref(database, 'sunbeds/' + id);
-            set(sunbedRef, {
-                color: value
-            });
+            syncElementToFirebase(id, 'sunbeds', value);
         }
     });
 
@@ -106,6 +109,8 @@ function syncWithFirebase() {
 
 // Función para cargar datos desde Firebase
 function loadFromFirebase() {
+    console.log('Cargando datos desde Firebase...');
+    
     // Cargar nombres de clientes
     const customersRef = ref(database, 'customers');
     onValue(customersRef, (snapshot) => {
@@ -113,7 +118,13 @@ function loadFromFirebase() {
         if (data) {
             Object.keys(data).forEach(id => {
                 const key = 'customer_name' + id;
-                localStorage.setItem(key, data[id].name);
+                const value = data[id].value;
+                localStorage.setItem(key, value);
+                // Actualizar UI
+                const input = $(`#${id} input.customer_name`);
+                if (input.length) {
+                    input.val(value);
+                }
             });
         }
     });
@@ -125,7 +136,14 @@ function loadFromFirebase() {
         if (data) {
             Object.keys(data).forEach(id => {
                 const key = 'sunbed_color' + id;
-                localStorage.setItem(key, data[id].color);
+                const value = data[id].value;
+                localStorage.setItem(key, value);
+                // Actualizar UI
+                const sunbed = $(`#${id}`);
+                if (sunbed.length) {
+                    sunbed.attr('data-step', value);
+                    sunbed.css('background-color', getColorForStep(value));
+                }
             });
         }
     });
@@ -136,6 +154,8 @@ function loadFromFirebase() {
         const data = snapshot.val();
         if (data) {
             localStorage.setItem('historial', JSON.stringify(data));
+            // Actualizar UI del historial
+            updateHistorialUI(data);
         }
     });
 
@@ -145,8 +165,43 @@ function loadFromFirebase() {
         const data = snapshot.val();
         if (data) {
             localStorage.setItem('total_sold', data.totalSold);
+            // Actualizar UI de totales
+            updateTotalsUI(data.totalSold);
         }
     });
+}
+
+// Función para actualizar la UI del historial
+function updateHistorialUI(historial) {
+    const historialList = $('#historial');
+    historialList.empty();
+    
+    if (Array.isArray(historial)) {
+        historial.forEach(item => {
+            historialList.append(`<li>${item}</li>`);
+        });
+    }
+}
+
+// Función para actualizar la UI de totales
+function updateTotalsUI(totalSold) {
+    $('#totalEfectivo').text(totalSold.efectivo || '0.00');
+    $('#totalTarjeta').text(totalSold.tarjeta || '0.00');
+    $('#totalGeneral').text(totalSold.general || '0.00');
+}
+
+// Función para obtener el color según el paso
+function getColorForStep(step) {
+    const colors = {
+        0: '#ffffff',
+        1: '#ff0000',
+        2: '#00ff00',
+        3: '#0000ff',
+        4: '#ffff00',
+        5: '#ff00ff',
+        6: '#00ffff'
+    };
+    return colors[step] || '#ffffff';
 }
 
 // Sincronizar cada 5 minutos
@@ -164,4 +219,22 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('No se encontró el botón de prueba de Firebase');
     }
+
+    // Escuchar cambios en los inputs de clientes
+    $(document).on('change', 'input.customer_name', function() {
+        const id = $(this).closest(".sunbed").attr('id');
+        const value = $(this).val();
+        const key = 'customer_name' + id;
+        localStorage.setItem(key, value);
+        syncElementToFirebase(id, 'customers', value);
+    });
+
+    // Escuchar cambios en los colores de las hamacas
+    $(document).on('click', '.sunbed', function() {
+        const id = $(this).attr('id');
+        const step = $(this).attr('data-step');
+        const key = 'sunbed_color' + id;
+        localStorage.setItem(key, step);
+        syncElementToFirebase(id, 'sunbeds', step);
+    });
 }); 
