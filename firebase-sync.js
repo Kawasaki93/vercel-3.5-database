@@ -65,140 +65,114 @@ function syncElementToFirebase(path, data) {
         .catch(error => console.error(`❌ Error al sincronizar ${path}:`, error));
 }
 
-// Función para sincronizar localStorage con Firebase
-function syncWithFirebase() {
-    console.log('Iniciando sincronización completa...');
+// Función para sincronizar todo el localStorage con Firebase
+function syncAllLocalStorageToFirebase() {
+    console.log('Sincronizando todo el localStorage con Firebase...');
     
-    // Sincronizar nombres de clientes
-    $("input.customer_name").each(function() {
-        const id = $(this).closest(".sunbed").attr('id');
-        const value = $(this).val();
-        if (value) {
-            syncElementToFirebase(`customers/${id}`, { name: value });
+    // Obtener todas las claves del localStorage
+    const allKeys = Object.keys(localStorage);
+    const dataToSync = {};
+    
+    allKeys.forEach(key => {
+        try {
+            // Intentar parsear el valor como JSON
+            const value = JSON.parse(localStorage.getItem(key));
+            dataToSync[key] = value;
+        } catch (e) {
+            // Si no es JSON, guardar como string
+            dataToSync[key] = localStorage.getItem(key);
         }
     });
-
-    // Sincronizar colores de hamacas
-    $(".sunbed").each(function() {
-        const id = $(this).attr('id');
-        const step = $(this).attr('data-step');
-        if (step) {
-            console.log(`Sincronizando hamaca ${id} con paso ${step}`);
-            syncElementToFirebase(`sunbeds/${id}`, { step: step });
-        }
-    });
-
-    // Sincronizar visibilidad de filas
-    for (let i = 0; i <= 8; i++) {
-        const isVisible = localStorage.getItem(`fila${i}_visible`);
-        if (isVisible !== null) {
-            console.log(`Sincronizando fila ${i} con visibilidad ${isVisible}`);
-            syncElementToFirebase(`filas/${i}`, { visible: isVisible === 'true' });
-        }
-    }
-
-    // Sincronizar historial
-    const historial = localStorage.getItem('historial');
-    if (historial) {
-        try {
-            const historialData = JSON.parse(historial);
-            console.log('Sincronizando historial:', historialData);
-            syncElementToFirebase('historial', historialData);
-        } catch (e) {
-            console.error('Error al parsear historial:', e);
-        }
-    }
-
-    // Sincronizar totales
-    const totalSold = localStorage.getItem('total_sold');
-    if (totalSold) {
-        try {
-            const totalData = JSON.parse(totalSold);
-            console.log('Sincronizando totales:', totalData);
-            syncElementToFirebase('totals', totalData);
-        } catch (e) {
-            console.error('Error al parsear totales:', e);
-        }
-    }
+    
+    console.log('Datos a sincronizar:', dataToSync);
+    
+    // Sincronizar todos los datos a Firebase
+    return syncElementToFirebase('localStorage', dataToSync)
+        .then(() => {
+            console.log('✅ Todos los datos del localStorage sincronizados con Firebase');
+        })
+        .catch(error => {
+            console.error('❌ Error al sincronizar localStorage:', error);
+        });
 }
 
 // Función para cargar datos desde Firebase
 function loadFromFirebase() {
     console.log('Cargando datos desde Firebase...');
     
-    // Cargar nombres de clientes
-    const customersRef = ref(database, 'customers');
-    onValue(customersRef, (snapshot) => {
+    // Cargar todos los datos del localStorage
+    const localStorageRef = ref(database, 'localStorage');
+    onValue(localStorageRef, (snapshot) => {
         const data = snapshot.val();
-        console.log('Datos de clientes recibidos:', data);
+        console.log('Datos recibidos de Firebase:', data);
         if (data) {
-            Object.keys(data).forEach(id => {
-                const value = data[id].name;
-                const key = 'customer_name' + id;
-                localStorage.setItem(key, value);
-                const input = $(`#${id} input.customer_name`);
-                if (input.length) {
-                    input.val(value);
+            Object.keys(data).forEach(key => {
+                try {
+                    if (typeof data[key] === 'object') {
+                        localStorage.setItem(key, JSON.stringify(data[key]));
+                    } else {
+                        localStorage.setItem(key, data[key]);
+                    }
+                } catch (e) {
+                    console.error(`Error al guardar ${key} en localStorage:`, e);
                 }
             });
+            
+            // Actualizar la UI con los datos cargados
+            updateUIWithLoadedData();
+        }
+    });
+}
+
+// Función para actualizar la UI con los datos cargados
+function updateUIWithLoadedData() {
+    // Actualizar nombres de clientes
+    $("input.customer_name").each(function() {
+        const id = $(this).closest(".sunbed").attr('id');
+        const value = localStorage.getItem('customer_name' + id);
+        if (value) {
+            $(this).val(value);
         }
     });
 
-    // Cargar colores de hamacas
-    const sunbedsRef = ref(database, 'sunbeds');
-    onValue(sunbedsRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log('Datos de hamacas recibidos:', data);
-        if (data) {
-            Object.keys(data).forEach(id => {
-                const step = data[id].step;
-                const key = 'sunbed_color' + id;
-                localStorage.setItem(key, step);
-                const sunbed = $(`#${id}`);
-                if (sunbed.length) {
-                    console.log(`Actualizando hamaca ${id} con paso ${step}`);
-                    sunbed.attr('data-step', step);
-                    updateSunbedColor(sunbed, step);
-                }
-            });
+    // Actualizar colores de hamacas
+    $(".sunbed").each(function() {
+        const id = $(this).attr('id');
+        const step = localStorage.getItem('sunbed_color' + id);
+        if (step) {
+            updateSunbedColor($(this), step);
         }
     });
 
-    // Cargar visibilidad de filas
-    const filasRef = ref(database, 'filas');
-    onValue(filasRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log('Datos de filas recibidos:', data);
-        if (data) {
-            Object.keys(data).forEach(filaNum => {
-                const isVisible = data[filaNum].visible;
-                localStorage.setItem(`fila${filaNum}_visible`, isVisible);
-                updateFilaVisibility(filaNum, isVisible);
-            });
+    // Actualizar visibilidad de filas
+    for (let i = 0; i <= 8; i++) {
+        const isVisible = localStorage.getItem(`fila${i}_visible`);
+        if (isVisible !== null) {
+            updateFilaVisibility(i, isVisible === 'true');
         }
-    });
+    }
 
-    // Cargar historial
-    const historialRef = ref(database, 'historial');
-    onValue(historialRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log('Datos de historial recibidos:', data);
-        if (data) {
-            localStorage.setItem('historial', JSON.stringify(data));
-            updateHistorialUI(data);
+    // Actualizar historial
+    const historial = localStorage.getItem('historial');
+    if (historial) {
+        try {
+            const historialData = JSON.parse(historial);
+            updateHistorialUI(historialData);
+        } catch (e) {
+            console.error('Error al parsear historial:', e);
         }
-    });
+    }
 
-    // Cargar totales
-    const totalsRef = ref(database, 'totals');
-    onValue(totalsRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log('Datos de totales recibidos:', data);
-        if (data) {
-            localStorage.setItem('total_sold', JSON.stringify(data));
-            updateTotalsUI(data);
+    // Actualizar totales
+    const totalSold = localStorage.getItem('total_sold');
+    if (totalSold) {
+        try {
+            const totalData = JSON.parse(totalSold);
+            updateTotalsUI(totalData);
+        } catch (e) {
+            console.error('Error al parsear totales:', e);
         }
-    });
+    }
 }
 
 // Función para actualizar el color de una hamaca
@@ -255,7 +229,7 @@ function updateTotalsUI(totalSold) {
 }
 
 // Sincronizar cada 5 minutos
-setInterval(syncWithFirebase, 300000);
+setInterval(syncAllLocalStorageToFirebase, 300000);
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
@@ -275,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Cambio en nombre de cliente ${id}: ${value}`);
         const key = 'customer_name' + id;
         localStorage.setItem(key, value);
-        syncElementToFirebase(`customers/${id}`, { name: value });
+        syncAllLocalStorageToFirebase();
     });
 
     // Variables para el doble click
@@ -297,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = 'sunbed_color' + id;
             localStorage.setItem(key, nextStep);
             updateSunbedColor($(this), nextStep);
-            syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
+            syncAllLocalStorageToFirebase();
         }
         
         lastClickTime = currentTime;
@@ -313,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Cambio en visibilidad de fila ${filaNum}: ${isVisible}`);
             localStorage.setItem(`fila${filaNum}_visible`, isVisible);
             updateFilaVisibility(filaNum, isVisible);
-            syncElementToFirebase(`filas/${filaNum}`, { visible: isVisible });
+            syncAllLocalStorageToFirebase();
         }
     });
 
@@ -323,16 +297,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const historial = JSON.parse(localStorage.getItem('historial') || '[]');
         historial.push(item);
         localStorage.setItem('historial', JSON.stringify(historial));
-        syncElementToFirebase('historial', historial);
+        syncAllLocalStorageToFirebase();
     };
 
     // Escuchar cambios en los totales
     window.updateTotals = function(totals) {
         console.log('Actualizando totales:', totals);
         localStorage.setItem('total_sold', JSON.stringify(totals));
-        syncElementToFirebase('totals', totals);
+        syncAllLocalStorageToFirebase();
     };
 
     // Forzar una sincronización inicial
-    syncWithFirebase();
+    syncAllLocalStorageToFirebase();
 }); 
