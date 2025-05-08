@@ -8,8 +8,32 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "src": "/style.css",
+      "dest": "/style.css"
+    },
+    {
+      "src": "/script.js",
+      "dest": "/script.js"
+    },
+    {
+      "src": "/firebase-sync.js",
+      "dest": "/firebase-sync.js"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/icon.png",
+      "dest": "/icon.png"
+    },
+    {
+      "src": "/service-worker.js",
+      "dest": "/service-worker.js"
+    },
+    {
+      "src": "/sw.json",
+      "dest": "/sw.json"
     },
     {
       "handle": "filesystem"
