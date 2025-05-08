@@ -831,368 +831,209 @@ let totalEfectivo = 0;
 let totalTarjeta = 0;
 
 function calcularCambio() {
-  const hamaca = document.getElementById('hamaca').value;
-  const totalSelect = parseFloat(document.getElementById('totalSelect').value);
-  const totalManual = parseFloat(document.getElementById('totalManual').value);
-  const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value);
-  const recibidoManual = parseFloat(document.getElementById('recibidoManual').value);
-  const metodo = document.getElementById('pago').value;
+    const hamaca = document.getElementById('hamaca').value;
+    const totalSelect = parseFloat(document.getElementById('totalSelect').value);
+    const totalManual = parseFloat(document.getElementById('totalManual').value);
+    const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value);
+    const recibidoManual = parseFloat(document.getElementById('recibidoManual').value);
+    const metodo = document.getElementById('pago').value;
 
-  const total = totalManual || totalSelect;
-  const recibido = recibidoManual || recibidoSelect;
+    const total = totalManual || totalSelect;
+    const recibido = recibidoManual || recibidoSelect;
 
-  if (isNaN(total) || isNaN(recibido)) {
-    alert("Por favor, introduce montos válidos.");
-    return;
-  }
+    if (isNaN(total) || isNaN(recibido)) {
+        alert("Por favor, introduce montos válidos.");
+        return;
+    }
 
-  const cambio = recibido - total;
-  document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
+    const cambio = recibido - total;
+    document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
 
-  const historial = document.getElementById('historial');
-  const li = document.createElement('li');
+    const historial = document.getElementById('historial');
+    const li = document.createElement('li');
 
-  const fechaObj = new Date();
-  const dia = String(fechaObj.getDate()).padStart(2, '0');
-  const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
-  const anio = fechaObj.getFullYear();
-  const horas = String(fechaObj.getHours()).padStart(2, '0');
-  const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
-  const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
+    const fechaObj = new Date();
+    const dia = String(fechaObj.getDate()).padStart(2, '0');
+    const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+    const anio = fechaObj.getFullYear();
+    const horas = String(fechaObj.getHours()).padStart(2, '0');
+    const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
+    const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
 
-  li.textContent = `Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Recibido: €${recibido.toFixed(2)} - Cambio: €${cambio.toFixed(2)} - Método: ${metodo} - ${fecha}`;
-  historial.insertBefore(li, historial.firstChild);
+    li.textContent = `Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Recibido: €${recibido.toFixed(2)} - Cambio: €${cambio.toFixed(2)} - Método: ${metodo} - ${fecha}`;
+    historial.insertBefore(li, historial.firstChild);
 
-  if (metodo === 'efectivo') {
-    totalEfectivo += total;
-  } else {
-    totalTarjeta += total;
-  }
+    if (metodo === 'efectivo') {
+        totalEfectivo += total;
+    } else {
+        totalTarjeta += total;
+    }
 
-  document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
-  document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
-  document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
+    document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
+    document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
+    document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-  datosHistorial.push({
-    fecha,
-    hamaca: hamaca || "-",
-    total: total.toFixed(2),
-    recibido: recibido.toFixed(2),
-    cambio: cambio.toFixed(2),
-    metodo
-  });
-  localStorage.setItem("historial", JSON.stringify(datosHistorial));
+    // Guardar en localStorage
+    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+    datosHistorial.push({
+        fecha,
+        hamaca: hamaca || "-",
+        total: total.toFixed(2),
+        recibido: recibido.toFixed(2),
+        cambio: cambio.toFixed(2),
+        metodo
+    });
+    localStorage.setItem("historial", JSON.stringify(datosHistorial));
 
-  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-  operaciones.push({
-    fecha,
-    hamaca: hamaca || "-",
-    pagado: total.toFixed(2),
-    devuelto: ""
-  });
-  localStorage.setItem("operaciones", JSON.stringify(operaciones));
+    let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+    operaciones.push({
+        fecha,
+        hamaca: hamaca || "-",
+        pagado: total.toFixed(2),
+        devuelto: ""
+    });
+    localStorage.setItem("operaciones", JSON.stringify(operaciones));
 
-  // Sincronizar con Firebase
-  calculatorRef.doc('transactions').collection('history').add({
-    fecha,
-    hamaca: hamaca || "-",
-    total: total.toFixed(2),
-    recibido: recibido.toFixed(2),
-    cambio: cambio.toFixed(2),
-    metodo
-  });
+    // Sincronizar con Firebase
+    calculatorRef.doc('transactions').collection('history').add({
+        fecha,
+        hamaca: hamaca || "-",
+        total: total.toFixed(2),
+        recibido: recibido.toFixed(2),
+        cambio: cambio.toFixed(2),
+        metodo,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-  calculatorRef.doc('totals').update({
-    totalEfectivo: totalEfectivo,
-    totalTarjeta: totalTarjeta
-  });
+    calculatorRef.doc('totals').set({
+        totalEfectivo: totalEfectivo,
+        totalTarjeta: totalTarjeta,
+        totalGeneral: totalEfectivo + totalTarjeta,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
 }
 
 function procesarDevolucion() {
-  const hamaca = document.getElementById('hamaca').value;
-  const totalSelect = parseFloat(document.getElementById('totalSelect').value);
-  const totalManual = parseFloat(document.getElementById('totalManual').value);
-  const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value);
-  const recibidoManual = parseFloat(document.getElementById('recibidoManual').value);
-  const metodo = document.getElementById('pago').value;
+    const hamaca = document.getElementById('hamaca').value;
+    const totalSelect = parseFloat(document.getElementById('totalSelect').value);
+    const totalManual = parseFloat(document.getElementById('totalManual').value);
+    const metodo = document.getElementById('pago').value;
 
-  // Usamos el total como el valor de lo que se debe devolver
-  const total = totalManual || totalSelect;
+    const total = totalManual || totalSelect;
 
-  if (isNaN(total)) {
-    alert("Por favor, introduce un monto válido.");
-    return;
-  }
+    if (isNaN(total)) {
+        alert("Por favor, introduce un monto válido.");
+        return;
+    }
 
-  // La devolución será simplemente el total (es decir, se debe devolver todo el monto)
-  const devolucion = total;
+    const devolucion = total;
+    document.getElementById('resultado').textContent = `Devolución: €${devolucion.toFixed(2)}`;
 
-  // Mostramos el monto de la devolución
-  document.getElementById('resultado').textContent = `Devolución: €${devolucion.toFixed(2)}`;
+    const historial = document.getElementById('historial');
+    const li = document.createElement('li');
 
-  const historial = document.getElementById('historial');
-  const li = document.createElement('li');
+    const fechaObj = new Date();
+    const dia = String(fechaObj.getDate()).padStart(2, '0');
+    const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+    const anio = fechaObj.getFullYear();
+    const horas = String(fechaObj.getHours()).padStart(2, '0');
+    const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
+    const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
 
-  // Fecha y hora del registro
-  const fechaObj = new Date();
-  const dia = String(fechaObj.getDate()).padStart(2, '0');
-  const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
-  const anio = fechaObj.getFullYear();
-  const horas = String(fechaObj.getHours()).padStart(2, '0');
-  const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
-  const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
+    li.textContent = `Devolución Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Devolución: €${devolucion.toFixed(2)} - Método: ${metodo} - ${fecha}`;
+    historial.insertBefore(li, historial.firstChild);
 
-  // Creamos el elemento de historial
-  li.textContent = `Devolución Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Devolución: €${devolucion.toFixed(2)} - Método: ${metodo} - ${fecha}`;
-  historial.insertBefore(li, historial.firstChild);
+    if (metodo === 'efectivo') {
+        totalEfectivo -= total;
+    } else {
+        totalTarjeta -= total;
+    }
 
-  // Actualizamos los totales de efectivo o tarjeta según el método de pago
-  if (metodo === 'efectivo') {
-    totalEfectivo -= total;  // Restamos el total para reflejar la devolución
-  } else {
-    totalTarjeta -= total;  // Restamos el total para reflejar la devolución
-  }
+    document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
+    document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
+    document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-  // Actualizamos el total en pantalla
-  document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
-  document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
-  document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
+    // Guardar en localStorage
+    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+    datosHistorial.push({
+        fecha,
+        hamaca: hamaca || "-",
+        total: total.toFixed(2),
+        devolucion: devolucion.toFixed(2),
+        metodo
+    });
+    localStorage.setItem("historial", JSON.stringify(datosHistorial));
 
-  // Guardamos el historial en localStorage
-  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-  datosHistorial.push({
-    fecha,
-    hamaca: hamaca || "-",
-    total: total.toFixed(2),
-    devolucion: devolucion.toFixed(2),
-    metodo
-  });
-  localStorage.setItem("historial", JSON.stringify(datosHistorial));
+    let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+    operaciones.push({
+        fecha,
+        hamaca: hamaca || "-",
+        pagado: "",
+        devuelto: devolucion.toFixed(2)
+    });
+    localStorage.setItem("operaciones", JSON.stringify(operaciones));
 
-  // Guardamos la operación de la devolución en el historial de operaciones
-  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-  operaciones.push({
-    fecha,
-    hamaca: hamaca || "-",
-    pagado: "",
-    devuelto: devolucion.toFixed(2)
-  });
-  localStorage.setItem("operaciones", JSON.stringify(operaciones));
+    // Sincronizar con Firebase
+    calculatorRef.doc('transactions').collection('history').add({
+        fecha,
+        hamaca: hamaca || "-",
+        total: total.toFixed(2),
+        devolucion: devolucion.toFixed(2),
+        metodo,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    calculatorRef.doc('totals').set({
+        totalEfectivo: totalEfectivo,
+        totalTarjeta: totalTarjeta,
+        totalGeneral: totalEfectivo + totalTarjeta,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+}
+
+function reiniciarCalculadora() {
+    document.getElementById('hamaca').value = '';
+    document.getElementById('totalSelect').selectedIndex = 0;
+    document.getElementById('totalManual').value = '';
+    document.getElementById('recibidoSelect').selectedIndex = 0;
+    document.getElementById('recibidoManual').value = '';
+    document.getElementById('pago').selectedIndex = 0;
+    document.getElementById('resultado').textContent = '';
+
+    totalEfectivo = 0;
+    totalTarjeta = 0;
+
+    document.getElementById('totalEfectivo').textContent = '0.00';
+    document.getElementById('totalTarjeta').textContent = '0.00';
+    document.getElementById('totalGeneral').textContent = '0.00';
+
+    const historial = document.getElementById('historial');
+    historial.innerHTML = '';
+
+    localStorage.removeItem('historial');
+
+    // Sincronizar con Firebase
+    calculatorRef.doc('totals').set({
+        totalEfectivo: 0,
+        totalTarjeta: 0,
+        totalGeneral: 0,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    });
 }
 
 function toggleHistorial() {
-  const historialContainer = document.getElementById('historialContainer');
-  historialContainer.style.display = historialContainer.style.display === 'none' ? 'block' : 'none';
+    const historialContainer = document.getElementById('historialContainer');
+    historialContainer.style.display = historialContainer.style.display === 'none' ? 'block' : 'none';
 }
 
 function descargarHistorial() {
-  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
 
-  const resumenDiario = {};
-  const resumenMensual = {};
+    const resumenDiario = {};
+    const resumenMensual = {};
 
-  datosHistorial.forEach(entry => {
-    // Manejo correcto para fechas en formato DD/MM/YYYY
-    let [dia, mes, anioHora] = entry.fecha.split('/');
-    let [anio] = anioHora.split(' ');
-    let fecha = new Date(`${anio}-${mes}-${dia}`);
-
-    const diaClave = `${String(fecha.getDate()).padStart(2, '0')}/${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
-    const mesClave = `${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
-    const total = parseFloat(entry.total || 0);
-    const metodo = entry.metodo;
-
-    if (!resumenDiario[diaClave]) {
-      resumenDiario[diaClave] = { efectivo: 0, tarjeta: 0 };
-    }
-    if (!resumenMensual[mesClave]) {
-      resumenMensual[mesClave] = { efectivo: 0, tarjeta: 0 };
-    }
-
-    if (metodo === 'efectivo') {
-      resumenDiario[diaClave].efectivo += total;
-      resumenMensual[mesClave].efectivo += total;
-    } else {
-      resumenDiario[diaClave].tarjeta += total;
-      resumenMensual[mesClave].tarjeta += total;
-    }
-  });
-
-  let csv = "Resumen Diario\nDía,Efectivo,Tarjeta,Total\n";
-  for (let dia in resumenDiario) {
-    const d = resumenDiario[dia];
-    csv += `${dia},${d.efectivo.toFixed(2)},${d.tarjeta.toFixed(2)},${(d.efectivo + d.tarjeta).toFixed(2)}\n`;
-  }
-
-  csv += "\nResumen Mensual\nMes,Efectivo,Tarjeta,Total\n";
-  for (let mes in resumenMensual) {
-    const m = resumenMensual[mes];
-    csv += `${mes},${m.efectivo.toFixed(2)},${m.tarjeta.toFixed(2)},${(m.efectivo + m.tarjeta).toFixed(2)}\n`;
-  }
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", "resumen_contabilidad_2025.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-
-function reiniciarCalculadora() {
-  document.getElementById('hamaca').value = '';
-  document.getElementById('totalSelect').selectedIndex = 0;
-  document.getElementById('totalManual').value = '';
-  document.getElementById('recibidoSelect').selectedIndex = 0;
-  document.getElementById('recibidoManual').value = '';
-  document.getElementById('pago').selectedIndex = 0;
-  document.getElementById('resultado').textContent = '';
-
-  totalEfectivo = 0;
-  totalTarjeta = 0;
-
-  document.getElementById('totalEfectivo').textContent = '0.00';
-  document.getElementById('totalTarjeta').textContent = '0.00';
-  document.getElementById('totalGeneral').textContent = '0.00';
-
-  const historial = document.getElementById('historial');
-  historial.innerHTML = '';
-
-  localStorage.removeItem('historial'); // solo historial, no operaciones
-}
-
-function descargarLog() {
-  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-
-  let csv = "Fecha,Hora,Hamaca,Pagado,Devuelto\n";
-
-  operaciones.forEach(entry => {
-    // Separar la fecha original "DD/MM/YYYY HH:MM"
-    const partes = entry.fecha.split(' ');
-    const fechaTexto = partes[0]; // "DD/MM/YYYY"
-    const horaTexto = partes[1] || ''; // "HH:MM"
-
-    csv += `${fechaTexto},${horaTexto},${entry.hamaca},${entry.pagado},${entry.devuelto}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", "log_operaciones_individuales.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-
-//FUNCIONAMIENTO DE SERVICE WORKER NO TOCAR
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then((reg) => {
-      console.log("Service Worker registrado", reg);
-    }).catch((err) => {
-      console.error("Error al registrar el Service Worker", err);
-    });
-  });
-}
-
-
-
-
-
-// Bucle de colores para los círculos
-
-
-function setupColorCycle(selector, steps, storage_key) {
-    $(selector).click(function() {
-        let actual_step = $(this).data('actual-step') || 0;
-        actual_step = (actual_step + 1) % steps;
-        
-        $(this).removeClass().addClass(selector.substring(1) + ' step' + actual_step);
-        $(this).data('actual-step', actual_step);
-        
-        let target_id = $(this).attr('id');
-        let target_key = storage_key + target_id;
-        
-        // Guardar en localStorage
-        localStorage.setItem(target_key, actual_step);
-        
-        // Sincronizar con Firebase
-        if (selector === '.circle') {
-            db.collection('circles').doc(target_id).set({
-                color: actual_step,
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        } else {
-            sunbedsRef.doc(target_id).set({
-                color: actual_step,
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-        }
-    });
-}
-
-// Aplicamos color cycle separado
-setupColorCycle('.circle', 3, 'circle_color_');
-setupColorCycle('.sunbed', 6, 'sunbed_color_');
-
-
-//------zona pruebas
-
-// Manejo del menú contextual de colores
-document.addEventListener('DOMContentLoaded', function() {
-    const contextMenu = document.getElementById('colorContextMenu');
-    let activeSunbed = null;
-
-    // Mostrar menú contextual al hacer clic derecho o mantener pulsado
-    document.addEventListener('contextmenu', function(e) {
-        const sunbed = e.target.closest('.sunbed');
-        if (sunbed) {
-            e.preventDefault();
-            activeSunbed = sunbed;
-            contextMenu.style.display = 'block';
-            contextMenu.style.left = e.pageX + 'px';
-            contextMenu.style.top = e.pageY + 'px';
-        }
-    });
-
-    // Cerrar menú al hacer clic en cualquier lugar
-    document.addEventListener('click', function(e) {
-        if (!contextMenu.contains(e.target)) {
-            contextMenu.style.display = 'none';
-        }
-    });
-
-    // Manejar la selección de color
-    contextMenu.addEventListener('click', function(e) {
-        const colorOption = e.target.closest('.color-option');
-        if (colorOption && activeSunbed) {
-            const step = colorOption.dataset.step;
-            
-            // Eliminar clases anteriores
-            for (let i = 1; i <= 6; i++) {
-                activeSunbed.classList.remove('step' + i);
-            }
-            
-            // Añadir nueva clase
-            activeSunbed.classList.add('step' + step);
-            activeSunbed.dataset.actualStep = step;
-            
-            // Guardar en localStorage
-            const sunbedId = activeSunbed.id;
-            localStorage.setItem('sunbed_color' + sunbedId, step);
-            
-            // Ocultar menú
-            contextMenu.style.display = 'none';
-        }
-    });
-
-    // Cerrar menú al hacer scroll
-    window.addEventListener('scroll', function() {
-        contextMenu.style.display = 'none';
-    });
-});
+    datosHistorial.forEach(entry => {
+        // Manejo correcto para fechas en formato DD/MM/YYYY
+        let [dia, mes, anioHora] = entry.fecha.split('/');
+        let [anio] = anioHora.split(' ');
+        let fecha = new Date(`${anio}-${mes}-${dia}`);
