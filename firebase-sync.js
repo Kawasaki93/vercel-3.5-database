@@ -1,6 +1,6 @@
 // Importar las funciones necesarias de Firebase
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -15,7 +15,8 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-const database = window.initializeFirebase(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 // Función para probar la conexión con Firebase
 function testFirebaseConnection() {
@@ -30,13 +31,14 @@ function testFirebaseConnection() {
     console.log('Intentando escribir en Firebase...');
     
     // Intentar escribir un dato de prueba
-    database.ref('test').set({
+    const testRef = ref(database, 'test');
+    set(testRef, {
         timestamp: new Date().toISOString(),
         message: 'Test de conexión'
     })
     .then(() => {
         console.log('Escritura exitosa, intentando leer...');
-        return database.ref('test').once('value');
+        return get(testRef);
     })
     .then((snapshot) => {
         const data = snapshot.val();
@@ -64,7 +66,8 @@ function syncWithFirebase() {
         const value = localStorage.getItem(key);
         
         if (value) {
-            database.ref('customers/' + id).set({
+            const customerRef = ref(database, 'customers/' + id);
+            set(customerRef, {
                 name: value
             });
         }
@@ -77,7 +80,8 @@ function syncWithFirebase() {
         const value = localStorage.getItem(key);
         
         if (value) {
-            database.ref('sunbeds/' + id).set({
+            const sunbedRef = ref(database, 'sunbeds/' + id);
+            set(sunbedRef, {
                 color: value
             });
         }
@@ -86,13 +90,15 @@ function syncWithFirebase() {
     // Sincronizar historial
     const historial = localStorage.getItem('historial');
     if (historial) {
-        database.ref('historial').set(JSON.parse(historial));
+        const historialRef = ref(database, 'historial');
+        set(historialRef, JSON.parse(historial));
     }
 
     // Sincronizar totales
     const totalSold = localStorage.getItem('total_sold');
     if (totalSold) {
-        database.ref('totals').set({
+        const totalsRef = ref(database, 'totals');
+        set(totalsRef, {
             totalSold: totalSold
         });
     }
@@ -101,7 +107,8 @@ function syncWithFirebase() {
 // Función para cargar datos desde Firebase
 function loadFromFirebase() {
     // Cargar nombres de clientes
-    database.ref('customers').on('value', (snapshot) => {
+    const customersRef = ref(database, 'customers');
+    onValue(customersRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
             Object.keys(data).forEach(id => {
@@ -112,7 +119,8 @@ function loadFromFirebase() {
     });
 
     // Cargar colores de hamacas
-    database.ref('sunbeds').on('value', (snapshot) => {
+    const sunbedsRef = ref(database, 'sunbeds');
+    onValue(sunbedsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
             Object.keys(data).forEach(id => {
@@ -123,7 +131,8 @@ function loadFromFirebase() {
     });
 
     // Cargar historial
-    database.ref('historial').on('value', (snapshot) => {
+    const historialRef = ref(database, 'historial');
+    onValue(historialRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
             localStorage.setItem('historial', JSON.stringify(data));
@@ -131,7 +140,8 @@ function loadFromFirebase() {
     });
 
     // Cargar totales
-    database.ref('totals').on('value', (snapshot) => {
+    const totalsRef = ref(database, 'totals');
+    onValue(totalsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
             localStorage.setItem('total_sold', data.totalSold);
