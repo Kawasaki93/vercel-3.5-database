@@ -19,12 +19,12 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 // Función para sincronizar un elemento específico con Firebase
-function syncElementToFirebase(path, data) {
-    console.log(`Sincronizando ${path} con datos:`, data);
-    const elementRef = ref(database, path);
+function syncElementToFirebase(key, data) {
+    console.log(`Sincronizando ${key} con datos:`, data);
+    const elementRef = ref(database, `app_data/${key}`);
     return set(elementRef, data)
-        .then(() => console.log(`✅ Datos sincronizados en ${path}`))
-        .catch(error => console.error(`❌ Error al sincronizar ${path}:`, error));
+        .then(() => console.log(`✅ Datos sincronizados en ${key}`))
+        .catch(error => console.error(`❌ Error al sincronizar ${key}:`, error));
 }
 
 // Función para sincronizar todo el localStorage con Firebase
@@ -49,7 +49,7 @@ function syncAllLocalStorageToFirebase() {
     console.log('Datos a sincronizar:', dataToSync);
     
     // Sincronizar todos los datos a Firebase
-    return syncElementToFirebase('localStorage', dataToSync);
+    return syncElementToFirebase('all_data', dataToSync);
 }
 
 // Función para cargar datos desde Firebase
@@ -57,7 +57,7 @@ function loadFromFirebase() {
     console.log('Cargando datos desde Firebase...');
     
     // Cargar todos los datos del localStorage
-    const localStorageRef = ref(database, 'localStorage');
+    const localStorageRef = ref(database, 'app_data/all_data');
     onValue(localStorageRef, (snapshot) => {
         const data = snapshot.val();
         console.log('Datos recibidos de Firebase:', data);
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Cambio en nombre de cliente ${id}: ${value}`);
         const key = 'customer_name' + id;
         localStorage.setItem(key, value);
-        syncElementToFirebase(`localStorage/${key}`, value);
+        syncElementToFirebase(key, value);
     });
 
     // Variables para el doble click
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Doble click en hamaca ${id}: de ${currentStep} a ${nextStep}`);
             const key = 'sunbed_color' + id;
             localStorage.setItem(key, nextStep);
-            syncElementToFirebase(`localStorage/${key}`, nextStep);
+            syncElementToFirebase(key, nextStep);
             updateSunbedColor($(this), nextStep);
         }
         
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Cambio en visibilidad de fila ${filaNum}: ${isVisible}`);
             const key = `fila${filaNum}_visible`;
             localStorage.setItem(key, isVisible);
-            syncElementToFirebase(`localStorage/${key}`, isVisible);
+            syncElementToFirebase(key, isVisible);
             updateFilaVisibility(filaNum, isVisible);
         }
     });
