@@ -286,22 +286,13 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const id = $(this).attr('id');
         const currentTime = new Date().getTime();
-        const currentStep = $(this).attr('data-step') || '1'; // Volvemos a comenzar en 1
+        const currentStep = $(this).attr('data-step') || '1';
         
-        // Verificar si es un doble click
+        // Solo procesar si es un doble click
         if (currentTime - lastClickTime < 300 && lastClickId === id) {
             // Es un doble click, avanzar dos pasos
             const nextStep = ((parseInt(currentStep) + 2) % 6) + 1;
             console.log(`Doble click en hamaca ${id}: de ${currentStep} a ${nextStep}`);
-            $(this).attr('data-step', nextStep);
-            const key = 'sunbed_color' + id;
-            localStorage.setItem(key, nextStep);
-            updateSunbedColor($(this), nextStep);
-            syncElementToFirebase(`sunbeds/${id}`, { step: nextStep });
-        } else {
-            // Es un click simple, avanzar un paso
-            const nextStep = ((parseInt(currentStep) + 1) % 6) + 1;
-            console.log(`Click simple en hamaca ${id}: de ${currentStep} a ${nextStep}`);
             $(this).attr('data-step', nextStep);
             const key = 'sunbed_color' + id;
             localStorage.setItem(key, nextStep);
