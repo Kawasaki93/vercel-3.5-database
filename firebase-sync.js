@@ -126,6 +126,8 @@ function loadFromFirebase() {
 
 // Función para actualizar la UI con los datos cargados
 function updateUIWithLoadedData() {
+    console.log('Actualizando UI con datos cargados...');
+    
     // Actualizar nombres de clientes
     $("input.customer_name").each(function() {
         const id = $(this).closest(".sunbed").attr('id');
@@ -140,6 +142,7 @@ function updateUIWithLoadedData() {
         const id = $(this).attr('id');
         const step = localStorage.getItem('sunbed_color' + id);
         if (step) {
+            console.log(`Actualizando color de hamaca ${id} con paso ${step}`);
             updateSunbedColor($(this), step);
         }
     });
