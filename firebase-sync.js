@@ -212,7 +212,7 @@ function updateSunbedColor(sunbed, step) {
         5: 'LightSeaGreen',
         6: 'red'
     };
-    const color = colors[step] || 'green'; // Cambiamos el color por defecto a verde
+    const color = colors[step] || 'LightSeaGreen'; // Volvemos a LightSeaGreen como color por defecto
     console.log(`Color aplicado: ${color}`);
     sunbed.css('background-color', color);
 }
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const id = $(this).attr('id');
         const currentTime = new Date().getTime();
-        const currentStep = $(this).attr('data-step') || '4'; // Cambiamos el paso inicial a 4 (verde)
+        const currentStep = $(this).attr('data-step') || '1'; // Volvemos a comenzar en 1
         
         // Verificar si es un doble click
         if (currentTime - lastClickTime < 300 && lastClickId === id) {
