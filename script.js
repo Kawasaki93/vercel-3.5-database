@@ -939,28 +939,31 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
 
             const currentStep = parseInt(el.data('actual-step')) || 0;
             const newStep = currentStep >= stepsCount ? 1 : currentStep + 1;
+            const timestamp = getCurrentTimestamp();
 
-            // Eliminar clases anteriores
-            for (let i = 1; i <= stepsCount; i++) {
-                el.removeClass('step' + i);
-            }
-
-            // Añadir nueva clase
-            el.addClass('step' + newStep);
-            el.data('actual-step', newStep);
+            // Actualizar el elemento localmente
+            updateElementColor(el, newStep, timestamp);
 
             // Guardar en localStorage y Firebase
-            saveToBoth(storageKey, newStep);
+            const data = {
+                step: newStep,
+                timestamp: timestamp,
+                deviceId: window.deviceId || 'unknown'
+            };
+            saveToBoth(storageKey, JSON.stringify(data));
         });
 
         // Restaurar estado desde localStorage
-        const savedStep = localStorage.getItem(storageKey);
-        if (savedStep) {
-            for (let i = 1; i <= stepsCount; i++) {
-                el.removeClass('step' + i);
+        const savedData = localStorage.getItem(storageKey);
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                updateElementColor(el, data.step, data.timestamp);
+            } catch (e) {
+                // Fallback para datos antiguos
+                const savedStep = savedData;
+                updateElementColor(el, savedStep, 0);
             }
-            el.addClass('step' + savedStep);
-            el.data('actual-step', savedStep);
         }
     });
 }
@@ -999,18 +1002,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (colorOption && activeSunbed) {
             const step = colorOption.dataset.step;
             const sunbedId = activeSunbed.id;
+            const timestamp = getCurrentTimestamp();
             
-            // Eliminar clases anteriores
-            for (let i = 1; i <= 6; i++) {
-                activeSunbed.classList.remove('step' + i);
-            }
-            
-            // Añadir nueva clase
-            activeSunbed.classList.add('step' + step);
-            activeSunbed.dataset.actualStep = step;
+            // Actualizar el elemento localmente
+            updateElementColor($(activeSunbed), step, timestamp);
             
             // Guardar en localStorage y Firebase
-            saveToBoth('sunbed_color' + sunbedId, step);
+            const data = {
+                step: step,
+                timestamp: timestamp,
+                deviceId: window.deviceId || 'unknown'
+            };
+            saveToBoth('sunbed_color_' + sunbedId, JSON.stringify(data));
             
             contextMenu.style.display = 'none';
         }
@@ -1063,12 +1066,22 @@ function guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo) {
 
 // Función para sincronizar colores con Firebase
 function syncColorsToFirebase() {
+    const timestamp = getCurrentTimestamp();
+    
     $('.sunbed').each(function() {
         const sunbed = $(this);
         const sunbedId = sunbed.attr('id');
         const currentStep = sunbed.data('actual-step');
-        if (currentStep) {
-            saveToBoth('sunbed_color' + sunbedId, currentStep);
+        const lastUpdate = sunbed.data('last-update') || 0;
+        
+        if (currentStep && timestamp > lastUpdate) {
+            const data = {
+                step: currentStep,
+                timestamp: timestamp,
+                deviceId: window.deviceId || 'unknown'
+            };
+            saveToBoth('sunbed_color_' + sunbedId, JSON.stringify(data));
+            sunbed.data('last-update', timestamp);
         }
     });
 
@@ -1076,13 +1089,41 @@ function syncColorsToFirebase() {
         const circle = $(this);
         const circleId = circle.attr('id');
         const currentStep = circle.data('actual-step');
-        if (currentStep) {
-            saveToBoth('circle_color_' + circleId, currentStep);
+        const lastUpdate = circle.data('last-update') || 0;
+        
+        if (currentStep && timestamp > lastUpdate) {
+            const data = {
+                step: currentStep,
+                timestamp: timestamp,
+                deviceId: window.deviceId || 'unknown'
+            };
+            saveToBoth('circle_color_' + circleId, JSON.stringify(data));
+            circle.data('last-update', timestamp);
         }
     });
 }
 
+// Función para actualizar el color de un elemento
+function updateElementColor(element, step, timestamp) {
+    const currentUpdate = $(element).data('last-update') || 0;
+    
+    if (timestamp > currentUpdate) {
+        // Eliminar clases anteriores
+        for (let i = 1; i <= 6; i++) {
+            $(element).removeClass('step' + i);
+        }
+        
+        // Añadir nueva clase
+        $(element).addClass('step' + step);
+        $(element).data('actual-step', step);
+        $(element).data('last-update', timestamp);
+    }
+}
+
+// Generar ID único para el dispositivo
+window.deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+
 // Configurar sincronización periódica
 setInterval(function() {
     syncColorsToFirebase();
-}, 10000); // Sincronizar cada 10 segundos
+}, 5000); // Sincronizar cada 5 segundos
