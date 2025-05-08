@@ -204,20 +204,18 @@ function loadFromFirebase() {
 // Función para actualizar el color de una hamaca
 function updateSunbedColor(sunbed, step) {
     console.log(`Actualizando color de hamaca ${sunbed.attr('id')} con paso ${step}`);
-    const colors = {
-        1: 'LightSeaGreen',
-        2: 'red',
-        3: 'orange',
-        4: 'green',
-        5: 'LightSeaGreen',
-        6: 'red'
-    };
-    const color = colors[step] || 'LightSeaGreen';
-    console.log(`Color aplicado: ${color}`);
-    sunbed.css('background-color', color);
-    // Añadir la clase correspondiente
+    
+    // Primero removemos todas las clases de step
     sunbed.removeClass('step1 step2 step3 step4 step5 step6');
-    sunbed.addClass(`step${step}`);
+    
+    // Luego añadimos la clase correspondiente al step actual
+    if (step) {
+        sunbed.addClass(`step${step}`);
+        console.log(`Añadida clase step${step}`);
+    }
+    
+    // Actualizamos el atributo data-step
+    sunbed.attr('data-step', step);
 }
 
 // Función para actualizar la visibilidad de una fila
@@ -296,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Es un doble click, avanzar dos pasos
             const nextStep = ((parseInt(currentStep) + 2) % 6) + 1;
             console.log(`Doble click en hamaca ${id}: de ${currentStep} a ${nextStep}`);
-            $(this).attr('data-step', nextStep);
             const key = 'sunbed_color' + id;
             localStorage.setItem(key, nextStep);
             updateSunbedColor($(this), nextStep);
