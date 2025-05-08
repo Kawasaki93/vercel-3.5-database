@@ -18,7 +18,7 @@ const firebaseConfig = {
 const database = window.initializeFirebase(firebaseConfig);
 
 // Función para probar la conexión con Firebase
-window.testFirebaseConnection = function() {
+function testFirebaseConnection() {
     console.log('Iniciando prueba de Firebase...');
     const statusDiv = document.getElementById('firebaseStatus');
     if (!statusDiv) {
@@ -53,7 +53,7 @@ window.testFirebaseConnection = function() {
         statusDiv.textContent = '❌ Error de conexión: ' + error.message;
         statusDiv.style.color = 'red';
     });
-};
+}
 
 // Función para sincronizar localStorage con Firebase
 function syncWithFirebase() {
@@ -142,8 +142,16 @@ function loadFromFirebase() {
 // Sincronizar cada 5 minutos
 setInterval(syncWithFirebase, 300000);
 
-// Cargar datos al iniciar
+// Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, inicializando Firebase...');
     loadFromFirebase();
+    
+    // Agregar el evento click al botón de prueba
+    const testButton = document.getElementById('testFirebaseBtn');
+    if (testButton) {
+        testButton.addEventListener('click', testFirebaseConnection);
+    } else {
+        console.error('No se encontró el botón de prueba de Firebase');
+    }
 }); 
