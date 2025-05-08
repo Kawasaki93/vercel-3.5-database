@@ -60,7 +60,9 @@ function testFirebaseConnection() {
 function syncElementToFirebase(path, data) {
     console.log(`Sincronizando ${path} con datos:`, data);
     const elementRef = ref(database, path);
-    set(elementRef, data);
+    set(elementRef, data)
+        .then(() => console.log(`✅ Datos sincronizados en ${path}`))
+        .catch(error => console.error(`❌ Error al sincronizar ${path}:`, error));
 }
 
 // Función para sincronizar localStorage con Firebase
@@ -81,6 +83,7 @@ function syncWithFirebase() {
         const id = $(this).attr('id');
         const step = $(this).attr('data-step');
         if (step) {
+            console.log(`Sincronizando hamaca ${id} con paso ${step}`);
             syncElementToFirebase(`sunbeds/${id}`, { step: step });
         }
     });
@@ -89,6 +92,7 @@ function syncWithFirebase() {
     for (let i = 0; i <= 8; i++) {
         const isVisible = localStorage.getItem(`fila${i}_visible`);
         if (isVisible) {
+            console.log(`Sincronizando fila ${i} con visibilidad ${isVisible}`);
             syncElementToFirebase(`filas/${i}`, { visible: isVisible === 'true' });
         }
     }
@@ -98,6 +102,7 @@ function syncWithFirebase() {
     if (historial) {
         try {
             const historialData = JSON.parse(historial);
+            console.log('Sincronizando historial:', historialData);
             syncElementToFirebase('historial', historialData);
         } catch (e) {
             console.error('Error al parsear historial:', e);
@@ -109,6 +114,7 @@ function syncWithFirebase() {
     if (totalSold) {
         try {
             const totalData = JSON.parse(totalSold);
+            console.log('Sincronizando totales:', totalData);
             syncElementToFirebase('totals', totalData);
         } catch (e) {
             console.error('Error al parsear totales:', e);
@@ -124,6 +130,7 @@ function loadFromFirebase() {
     const customersRef = ref(database, 'customers');
     onValue(customersRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('Datos de clientes recibidos:', data);
         if (data) {
             Object.keys(data).forEach(id => {
                 const value = data[id].name;
@@ -141,6 +148,7 @@ function loadFromFirebase() {
     const sunbedsRef = ref(database, 'sunbeds');
     onValue(sunbedsRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('Datos de hamacas recibidos:', data);
         if (data) {
             Object.keys(data).forEach(id => {
                 const step = data[id].step;
@@ -148,6 +156,7 @@ function loadFromFirebase() {
                 localStorage.setItem(key, step);
                 const sunbed = $(`#${id}`);
                 if (sunbed.length) {
+                    console.log(`Actualizando hamaca ${id} con paso ${step}`);
                     sunbed.attr('data-step', step);
                     updateSunbedColor(sunbed, step);
                 }
@@ -159,6 +168,7 @@ function loadFromFirebase() {
     const filasRef = ref(database, 'filas');
     onValue(filasRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('Datos de filas recibidos:', data);
         if (data) {
             Object.keys(data).forEach(filaNum => {
                 const isVisible = data[filaNum].visible;
@@ -172,6 +182,7 @@ function loadFromFirebase() {
     const historialRef = ref(database, 'historial');
     onValue(historialRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('Datos de historial recibidos:', data);
         if (data) {
             localStorage.setItem('historial', JSON.stringify(data));
             updateHistorialUI(data);
@@ -182,6 +193,7 @@ function loadFromFirebase() {
     const totalsRef = ref(database, 'totals');
     onValue(totalsRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('Datos de totales recibidos:', data);
         if (data) {
             localStorage.setItem('total_sold', JSON.stringify(data));
             updateTotalsUI(data);
@@ -191,6 +203,7 @@ function loadFromFirebase() {
 
 // Función para actualizar el color de una hamaca
 function updateSunbedColor(sunbed, step) {
+    console.log(`Actualizando color de hamaca ${sunbed.attr('id')} con paso ${step}`);
     const colors = {
         0: '#ffffff',
         1: '#ff0000',
@@ -200,21 +213,29 @@ function updateSunbedColor(sunbed, step) {
         5: '#ff00ff',
         6: '#00ffff'
     };
-    sunbed.css('background-color', colors[step] || '#ffffff');
+    const color = colors[step] || '#ffffff';
+    console.log(`Color aplicado: ${color}`);
+    sunbed.css('background-color', color);
 }
 
 // Función para actualizar la visibilidad de una fila
 function updateFilaVisibility(filaNum, isVisible) {
+    console.log(`Actualizando visibilidad de fila ${filaNum} a ${isVisible}`);
     const fila = $(`.sunbed[data-fila="${filaNum}"]`);
-    if (isVisible) {
-        fila.show();
+    if (fila.length) {
+        if (isVisible) {
+            fila.show();
+        } else {
+            fila.hide();
+        }
     } else {
-        fila.hide();
+        console.warn(`No se encontraron elementos para la fila ${filaNum}`);
     }
 }
 
 // Función para actualizar la UI del historial
 function updateHistorialUI(historial) {
+    console.log('Actualizando UI del historial:', historial);
     const historialList = $('#historial');
     historialList.empty();
     
@@ -227,6 +248,7 @@ function updateHistorialUI(historial) {
 
 // Función para actualizar la UI de totales
 function updateTotalsUI(totalSold) {
+    console.log('Actualizando UI de totales:', totalSold);
     $('#totalEfectivo').text(totalSold.efectivo || '0.00');
     $('#totalTarjeta').text(totalSold.tarjeta || '0.00');
     $('#totalGeneral').text(totalSold.general || '0.00');
@@ -250,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $(document).on('change', 'input.customer_name', function() {
         const id = $(this).closest(".sunbed").attr('id');
         const value = $(this).val();
+        console.log(`Cambio en nombre de cliente ${id}: ${value}`);
         const key = 'customer_name' + id;
         localStorage.setItem(key, value);
         syncElementToFirebase(`customers/${id}`, { name: value });
@@ -259,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $(document).on('click', '.sunbed', function() {
         const id = $(this).attr('id');
         const step = $(this).attr('data-step');
+        console.log(`Cambio en color de hamaca ${id}: ${step}`);
         const key = 'sunbed_color' + id;
         localStorage.setItem(key, step);
         syncElementToFirebase(`sunbeds/${id}`, { step: step });
@@ -270,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (buttonText.startsWith('Fila')) {
             const filaNum = buttonText.replace('Fila', '');
             const isVisible = localStorage.getItem(`fila${filaNum}_visible`) !== 'true';
+            console.log(`Cambio en visibilidad de fila ${filaNum}: ${isVisible}`);
             localStorage.setItem(`fila${filaNum}_visible`, isVisible);
             syncElementToFirebase(`filas/${filaNum}`, { visible: isVisible });
         }
@@ -277,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Escuchar cambios en el historial
     window.addToHistorial = function(item) {
+        console.log('Agregando al historial:', item);
         const historial = JSON.parse(localStorage.getItem('historial') || '[]');
         historial.push(item);
         localStorage.setItem('historial', JSON.stringify(historial));
@@ -285,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Escuchar cambios en los totales
     window.updateTotals = function(totals) {
+        console.log('Actualizando totales:', totals);
         localStorage.setItem('total_sold', JSON.stringify(totals));
         syncElementToFirebase('totals', totals);
     };
