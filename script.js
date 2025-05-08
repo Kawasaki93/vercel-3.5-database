@@ -932,7 +932,7 @@ if ('serviceWorker' in navigator) {
 function setupColorCycle(selector, stepsCount, storagePrefix) {
     $(selector).each(function (index) {
         const el = $(this);
-        const storageKey = storagePrefix + index;
+        const storageKey = storagePrefix + (el.attr('id') || index);
 
         el.on('dblclick', function (event) {
             event.stopPropagation();
@@ -949,8 +949,8 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
             el.addClass('step' + newStep);
             el.data('actual-step', newStep);
 
-            // Guardar en localStorage
-            localStorage.setItem(storageKey, newStep);
+            // Guardar en localStorage y Firebase
+            saveToBoth(storageKey, newStep);
         });
 
         // Restaurar estado desde localStorage
@@ -977,7 +977,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const contextMenu = document.getElementById('colorContextMenu');
     let activeSunbed = null;
 
-    // Mostrar menú contextual al hacer clic derecho o mantener pulsado
     document.addEventListener('contextmenu', function(e) {
         const sunbed = e.target.closest('.sunbed');
         if (sunbed) {
@@ -989,18 +988,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Cerrar menú al hacer clic en cualquier lugar
     document.addEventListener('click', function(e) {
         if (!contextMenu.contains(e.target)) {
             contextMenu.style.display = 'none';
         }
     });
 
-    // Manejar la selección de color
     contextMenu.addEventListener('click', function(e) {
         const colorOption = e.target.closest('.color-option');
         if (colorOption && activeSunbed) {
             const step = colorOption.dataset.step;
+            const sunbedId = activeSunbed.id;
             
             // Eliminar clases anteriores
             for (let i = 1; i <= 6; i++) {
@@ -1011,16 +1009,13 @@ document.addEventListener('DOMContentLoaded', function() {
             activeSunbed.classList.add('step' + step);
             activeSunbed.dataset.actualStep = step;
             
-            // Guardar en localStorage
-            const sunbedId = activeSunbed.id;
-            localStorage.setItem('sunbed_color' + sunbedId, step);
+            // Guardar en localStorage y Firebase
+            saveToBoth('sunbed_color' + sunbedId, step);
             
-            // Ocultar menú
             contextMenu.style.display = 'none';
         }
     });
 
-    // Cerrar menú al hacer scroll
     window.addEventListener('scroll', function() {
         contextMenu.style.display = 'none';
     });
@@ -1065,3 +1060,29 @@ function guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo) {
     });
     saveJSONToBoth("operaciones", operaciones);
 }
+
+// Función para sincronizar colores con Firebase
+function syncColorsToFirebase() {
+    $('.sunbed').each(function() {
+        const sunbed = $(this);
+        const sunbedId = sunbed.attr('id');
+        const currentStep = sunbed.data('actual-step');
+        if (currentStep) {
+            saveToBoth('sunbed_color' + sunbedId, currentStep);
+        }
+    });
+
+    $('.circle').each(function() {
+        const circle = $(this);
+        const circleId = circle.attr('id');
+        const currentStep = circle.data('actual-step');
+        if (currentStep) {
+            saveToBoth('circle_color_' + circleId, currentStep);
+        }
+    });
+}
+
+// Configurar sincronización periódica
+setInterval(function() {
+    syncColorsToFirebase();
+}, 10000); // Sincronizar cada 10 segundos
