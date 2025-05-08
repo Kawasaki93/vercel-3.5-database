@@ -1,6 +1,6 @@
 // Importar las funciones necesarias de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -22,23 +22,9 @@ const database = getDatabase(app);
 function syncElementToFirebase(path, data) {
     console.log(`Sincronizando ${path} con datos:`, data);
     const elementRef = ref(database, path);
-    return set(elementRef, {
-        value: data,
-        timestamp: serverTimestamp(),
-        deviceId: getDeviceId()
-    })
-    .then(() => console.log(`✅ Datos sincronizados en ${path}`))
-    .catch(error => console.error(`❌ Error al sincronizar ${path}:`, error));
-}
-
-// Función para obtener un ID único del dispositivo
-function getDeviceId() {
-    let deviceId = localStorage.getItem('deviceId');
-    if (!deviceId) {
-        deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('deviceId', deviceId);
-    }
-    return deviceId;
+    return set(elementRef, data)
+        .then(() => console.log(`✅ Datos sincronizados en ${path}`))
+        .catch(error => console.error(`❌ Error al sincronizar ${path}:`, error));
 }
 
 // Función para sincronizar todo el localStorage con Firebase
@@ -76,34 +62,21 @@ function loadFromFirebase() {
         const data = snapshot.val();
         console.log('Datos recibidos de Firebase:', data);
         
-        if (data && data.value) {
-            const remoteData = data.value;
-            const remoteTimestamp = data.timestamp;
-            const remoteDeviceId = data.deviceId;
-            
-            // Solo actualizar si los datos son más recientes o vienen de otro dispositivo
-            const localTimestamp = localStorage.getItem('lastSyncTimestamp');
-            if (!localTimestamp || remoteTimestamp > localTimestamp) {
-                console.log('Actualizando datos locales con datos más recientes...');
-                
-                Object.keys(remoteData).forEach(key => {
-                    try {
-                        if (typeof remoteData[key] === 'object') {
-                            localStorage.setItem(key, JSON.stringify(remoteData[key]));
-                        } else {
-                            localStorage.setItem(key, remoteData[key]);
-                        }
-                    } catch (e) {
-                        console.error(`Error al guardar ${key} en localStorage:`, e);
+        if (data) {
+            Object.keys(data).forEach(key => {
+                try {
+                    if (typeof data[key] === 'object') {
+                        localStorage.setItem(key, JSON.stringify(data[key]));
+                    } else {
+                        localStorage.setItem(key, data[key]);
                     }
-                });
-                
-                // Actualizar timestamp de última sincronización
-                localStorage.setItem('lastSyncTimestamp', remoteTimestamp);
-                
-                // Actualizar la UI
-                updateUIWithLoadedData();
-            }
+                } catch (e) {
+                    console.error(`Error al guardar ${key} en localStorage:`, e);
+                }
+            });
+            
+            // Actualizar la UI
+            updateUIWithLoadedData();
         }
     });
 }
@@ -138,28 +111,6 @@ function updateUIWithLoadedData() {
             updateFilaVisibility(i, isVisible === 'true');
         }
     }
-
-    // Actualizar historial
-    const historial = localStorage.getItem('historial');
-    if (historial) {
-        try {
-            const historialData = JSON.parse(historial);
-            updateHistorialUI(historialData);
-        } catch (e) {
-            console.error('Error al parsear historial:', e);
-        }
-    }
-
-    // Actualizar totales
-    const totalSold = localStorage.getItem('total_sold');
-    if (totalSold) {
-        try {
-            const totalData = JSON.parse(totalSold);
-            updateTotalsUI(totalData);
-        } catch (e) {
-            console.error('Error al parsear totales:', e);
-        }
-    }
 }
 
 // Función para actualizar el color de una hamaca
@@ -191,83 +142,12 @@ function updateFilaVisibility(filaNum, isVisible) {
     }
 }
 
-// Función para actualizar la UI del historial
-function updateHistorialUI(historial) {
-    console.log('Actualizando UI del historial:', historial);
-    const historialList = $('#historial');
-    historialList.empty();
-    
-    if (Array.isArray(historial)) {
-        historial.forEach(item => {
-            historialList.append(`<li>${item}</li>`);
-        });
-    }
-}
-
-// Función para actualizar la UI de totales
-function updateTotalsUI(totalSold) {
-    console.log('Actualizando UI de totales:', totalSold);
-    $('#totalEfectivo').text(totalSold.efectivo || '0.00');
-    $('#totalTarjeta').text(totalSold.tarjeta || '0.00');
-    $('#totalGeneral').text(totalSold.general || '0.00');
-}
-
-// Función para probar la conexión con Firebase
-function testFirebaseConnection() {
-    console.log('Iniciando prueba de Firebase...');
-    const statusDiv = document.getElementById('firebaseStatus');
-    if (!statusDiv) {
-        console.error('No se encontró el elemento firebaseStatus');
-        return;
-    }
-    
-    statusDiv.textContent = 'Probando conexión...';
-    console.log('Intentando escribir en Firebase...');
-    
-    const testRef = ref(database, 'test');
-    set(testRef, {
-        timestamp: serverTimestamp(),
-        message: 'Test de conexión',
-        deviceId: getDeviceId()
-    })
-    .then(() => {
-        console.log('Escritura exitosa, intentando leer...');
-        return get(testRef);
-    })
-    .then((snapshot) => {
-        const data = snapshot.val();
-        console.log('Datos leídos:', data);
-        if (data) {
-            statusDiv.textContent = '✅ Conexión exitosa!';
-            statusDiv.style.color = 'green';
-        } else {
-            throw new Error('No se pudieron leer los datos');
-        }
-    })
-    .catch((error) => {
-        console.error('Error en la prueba:', error);
-        statusDiv.textContent = '❌ Error de conexión: ' + error.message;
-        statusDiv.style.color = 'red';
-    });
-}
-
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, inicializando Firebase...');
     
-    // Agregar el evento click al botón de prueba
-    const testButton = document.getElementById('testFirebaseBtn');
-    if (testButton) {
-        testButton.addEventListener('click', testFirebaseConnection);
-    }
-
-    // Escuchar cambios en localStorage
-    window.addEventListener('storage', (e) => {
-        console.log('Cambio detectado en localStorage:', e.key);
-        if (e.key) {
-            syncElementToFirebase(`localStorage/${e.key}`, e.newValue);
-        }
-    });
+    // Cargar datos iniciales desde Firebase
+    loadFromFirebase();
 
     // Escuchar cambios en los inputs de clientes
     $(document).on('change', 'input.customer_name', function() {
@@ -319,25 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Escuchar cambios en el historial
-    window.addToHistorial = function(item) {
-        console.log('Agregando al historial:', item);
-        const historial = JSON.parse(localStorage.getItem('historial') || '[]');
-        historial.push(item);
-        localStorage.setItem('historial', JSON.stringify(historial));
-        syncElementToFirebase('localStorage/historial', historial);
-    };
-
-    // Escuchar cambios en los totales
-    window.updateTotals = function(totals) {
-        console.log('Actualizando totales:', totals);
-        localStorage.setItem('total_sold', JSON.stringify(totals));
-        syncElementToFirebase('localStorage/total_sold', totals);
-    };
-
-    // Cargar datos iniciales desde Firebase
-    loadFromFirebase();
-
-    // Sincronizar cada 5 segundos
-    setInterval(syncAllLocalStorageToFirebase, 5000);
+    // Sincronizar cada 2 segundos
+    setInterval(syncAllLocalStorageToFirebase, 2000);
 }); 
