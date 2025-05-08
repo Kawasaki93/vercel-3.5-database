@@ -9,22 +9,9 @@
   <!-- Scripts externos -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    
-    window.initializeFirebase = function(config) {
-      console.log('Inicializando Firebase...');
-      const app = initializeApp(config);
-      const database = getDatabase(app);
-      window.firebaseDatabase = database;
-      return database;
-    };
-  </script>
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -65,9 +52,6 @@
 
 <br><br>
   <button class="button" onclick="clearClick(1)">Reset Local Storage</button>
-  <br><br>
-  <button class="button" id="testFirebaseBtn">Probar Firebase</button>
-  <div id="firebaseStatus" style="margin-top: 10px; color: #666;"></div>
 </div>
 
 <div class="beach_wrapper">
@@ -158,8 +142,7 @@
   </div>
 </div>
 <!-- Scripts personalizados -->
-<script src="script.js"></script>
-<script type="module" src="firebase-sync.js"></script>
+<script src="./script.js"></script>
 
 <!-- Menú contextual de colores -->
 <div class="color-context-menu" id="colorContextMenu">
@@ -170,6 +153,5 @@
   <div class="color-option step5" data-step="5"></div>
   <div class="color-option step6" data-step="6"></div>
 </div>
-
 </body>
 </html>

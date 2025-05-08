@@ -1,60 +1,14 @@
-// Función para obtener timestamp actual
-function getCurrentTimestamp() {
-    return Date.now();
-}
-
-// Función para generar un ID único de versión
-function generateVersionId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then((reg) => {
-            console.log("Service Worker registrado", reg);
-        }).catch((err) => {
-            console.error("Error al registrar el Service Worker", err);
-        });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((reg) => {
+      console.log("Service Worker registrado", reg);
+    }).catch((err) => {
+      console.error("Error al registrar el Service Worker", err);
     });
+  });
 }
 
-// Función para validar y sanitizar datos antes de guardar
-function sanitizeData(data) {
-    if (typeof data === 'number' && isNaN(data)) {
-        return 0;
-    }
-    if (typeof data === 'object') {
-        const sanitized = {};
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                sanitized[key] = sanitizeData(data[key]);
-            }
-        }
-        return sanitized;
-    }
-    return data;
-}
 
-// Función para actualizar el color de un elemento
-function updateElementColor(element, step, timestamp, version) {
-    const currentUpdate = parseInt($(element).data('last-update')) || 0;
-    const currentVersion = $(element).data('version') || '';
-    step = parseInt(step) || 0;
-    
-    // Solo actualizar si el timestamp es más reciente o si es la misma versión
-    if ((timestamp > currentUpdate || version === currentVersion) && step > 0) {
-        // Eliminar clases anteriores
-        for (let i = 1; i <= 6; i++) {
-            $(element).removeClass('step' + i);
-        }
-        
-        // Añadir nueva clase
-        $(element).addClass('step' + step);
-        $(element).data('actual-step', step);
-        $(element).data('last-update', timestamp);
-        $(element).data('version', version);
-    }
-}
 
 let variable1;
 for (var x = 1; x < 126; x++) {
@@ -280,7 +234,11 @@ for (var x = 1; x < 126; x++) {
     cloned_element.find(".sunbed_name").html(1);
 } else if (x === 125) {
     cloned_element.find(".sunbed_name").html(0);
+
+
+
 }
+
 
   $(".beach_wrapper").append(cloned_element);
 }
@@ -341,10 +299,10 @@ function toggleDesconectadosFila8() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila8.css("visibility", "visible");
-        saveToBoth("desconectadosFila8Visibility", "visible");
+        localStorage.setItem("desconectadosFila8Visibility", "visible");
     } else {
         $desconectadosFila8.css("visibility", "hidden");
-        saveToBoth("desconectadosFila8Visibility", "hidden");
+        localStorage.setItem("desconectadosFila8Visibility", "hidden");
     }
 }
 
@@ -365,10 +323,10 @@ function toggledesconectadosFila4() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila4.css("visibility", "visible");
-        saveToBoth("desconectadosFila4Visibility", "visible");
+        localStorage.setItem("desconectadosFila4Visibility", "visible");
     } else {
         $desconectadosFila4.css("visibility", "hidden");
-        saveToBoth("desconectadosFila4Visibility", "hidden");
+        localStorage.setItem("desconectadosFila4Visibility", "hidden");
     }
 }
 
@@ -389,10 +347,10 @@ function toggledesconectadosFila3() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila3.css("visibility", "visible");
-        saveToBoth("desconectadosFila3Visibility", "visible");
+        localStorage.setItem("desconectadosFila3Visibility", "visible");
     } else {
         $desconectadosFila3.css("visibility", "hidden");
-        saveToBoth("desconectadosFila3Visibility", "hidden");
+        localStorage.setItem("desconectadosFila3Visibility", "hidden");
     }
 }
 
@@ -413,10 +371,10 @@ function toggledesconectadosFila2() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila2.css("visibility", "visible");
-        saveToBoth("desconectadosFila2Visibility", "visible");
+        localStorage.setItem("desconectadosFila2Visibility", "visible");
     } else {
         $desconectadosFila2.css("visibility", "hidden");
-        saveToBoth("desconectadosFila2Visibility", "hidden");
+        localStorage.setItem("desconectadosFila2Visibility", "hidden");
     }
 }
 
@@ -440,10 +398,10 @@ function toggledesconectadosFila1() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila1.css("visibility", "visible");
-        saveToBoth("desconectadosFila1Visibility", "visible");
+        localStorage.setItem("desconectadosFila1Visibility", "visible");
     } else {
         $desconectadosFila1.css("visibility", "hidden");
-        saveToBoth("desconectadosFila1Visibility", "hidden");
+        localStorage.setItem("desconectadosFila1Visibility", "hidden");
     }
 }
 
@@ -464,10 +422,10 @@ function toggleDesconectadosFila0() {
 
     if (currentVisibility === "hidden") {
         $desconectadosFila0.css("visibility", "visible");
-        saveToBoth("desconectadosFila0Visibility", "visible");
+        localStorage.setItem("desconectadosFila0Visibility", "visible");
     } else {
         $desconectadosFila0.css("visibility", "hidden");
-        saveToBoth("desconectadosFila0Visibility", "hidden");
+        localStorage.setItem("desconectadosFila0Visibility", "hidden");
     }
 }
 
@@ -488,10 +446,10 @@ function toggleZonalibre() {
 
     if (currentVisibility === "hidden") {
         $Zonalibre.css("visibility", "visible");
-        saveToBoth("ZonalibreVisibility", "visible");
+        localStorage.setItem("ZonalibreVisibility", "visible");
     } else {
         $Zonalibre.css("visibility", "hidden");
-        saveToBoth("ZonalibreVisibility", "hidden");
+        localStorage.setItem("ZonalibreVisibility", "hidden");
     }
 }
 
@@ -512,10 +470,10 @@ function toggleZonalibre2() {
 
     if (currentVisibility === "hidden") {
         $Zonalibre2.css("visibility", "visible");
-        saveToBoth("Zonalibre2Visibility", "visible");
+        localStorage.setItem("Zonalibre2Visibility", "visible");
     } else {
         $Zonalibre2.css("visibility", "hidden");
-        saveToBoth("Zonalibre2Visibility", "hidden");
+        localStorage.setItem("Zonalibre2Visibility", "hidden");
     }
 }
 
@@ -537,10 +495,10 @@ function toggleclon10A() {
 
     if (currentVisibility === "hidden") {
         $clon10A.css("visibility", "visible");
-        saveToBoth("clon10AVisibility", "visible");
+        localStorage.setItem("clon10AVisibility", "visible");
     } else {
         $clon10A.css("visibility", "hidden");
-        saveToBoth("clon10AVisibility", "hidden");
+        localStorage.setItem("clon10AVisibility", "hidden");
     }
 }
 
@@ -561,10 +519,10 @@ function toggleclon0() {
 
     if (currentVisibility === "hidden") {
         $clon0.css("visibility", "visible");
-        saveToBoth("clon0Visibility", "visible");
+        localStorage.setItem("clon0Visibility", "visible");
     } else {
         $clon0.css("visibility", "hidden");
-        saveToBoth("clon0Visibility", "hidden");
+        localStorage.setItem("clon0Visibility", "hidden");
     }
 }
 
@@ -635,12 +593,12 @@ var SunbedController = function() {
                 var text = $(this).val();
                 var target_id = $(this).closest(".sunbed").attr('id');
                 let target_key = 'customer_name' + target_id;
-                saveToBoth(target_key, text);
+                localStorage.setItem(target_key, text);
             });
 
             $("#comments").keyup(function() {
                let actual_value = $(this).val();
-               saveToBoth('comments', actual_value);
+               localStorage.setItem('comments', actual_value);
             });
 
           
@@ -704,9 +662,6 @@ var SunbedController = function() {
             !local_key.includes('Visibility')
         ) {
             localStorage.removeItem(local_key);
-            if (window.syncElementToFirebase) {
-                window.syncElementToFirebase(local_key, null);
-            }
         }
     });
 
@@ -788,7 +743,25 @@ function calcularCambio() {
   document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
   document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-  guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo);
+  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+  datosHistorial.push({
+    fecha,
+    hamaca: hamaca || "-",
+    total: total.toFixed(2),
+    recibido: recibido.toFixed(2),
+    cambio: cambio.toFixed(2),
+    metodo
+  });
+  localStorage.setItem("historial", JSON.stringify(datosHistorial));
+
+  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+  operaciones.push({
+    fecha,
+    hamaca: hamaca || "-",
+    pagado: total.toFixed(2),
+    devuelto: ""
+  });
+  localStorage.setItem("operaciones", JSON.stringify(operaciones));
 }
 
 function procesarDevolucion() {
@@ -842,7 +815,25 @@ function procesarDevolucion() {
   document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
   // Guardamos el historial en localStorage
-  guardarEnHistorial(fecha, hamaca, total, devolucion, devolucion, metodo);
+  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+  datosHistorial.push({
+    fecha,
+    hamaca: hamaca || "-",
+    total: total.toFixed(2),
+    devolucion: devolucion.toFixed(2),
+    metodo
+  });
+  localStorage.setItem("historial", JSON.stringify(datosHistorial));
+
+  // Guardamos la operación de la devolución en el historial de operaciones
+  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+  operaciones.push({
+    fecha,
+    hamaca: hamaca || "-",
+    pagado: "",
+    devuelto: devolucion.toFixed(2)
+  });
+  localStorage.setItem("operaciones", JSON.stringify(operaciones));
 }
 
 function toggleHistorial() {
@@ -974,40 +965,35 @@ if ('serviceWorker' in navigator) {
 function setupColorCycle(selector, stepsCount, storagePrefix) {
     $(selector).each(function (index) {
         const el = $(this);
-        const storageKey = storagePrefix + (el.attr('id') || index);
+        const storageKey = storagePrefix + index;
 
         el.on('dblclick', function (event) {
             event.stopPropagation();
 
             const currentStep = parseInt(el.data('actual-step')) || 0;
             const newStep = currentStep >= stepsCount ? 1 : currentStep + 1;
-            const timestamp = getCurrentTimestamp();
-            const version = generateVersionId();
 
-            // Actualizar el elemento localmente
-            updateElementColor(el, newStep, timestamp, version);
+            // Eliminar clases anteriores
+            for (let i = 1; i <= stepsCount; i++) {
+                el.removeClass('step' + i);
+            }
 
-            // Guardar en localStorage y Firebase
-            const data = sanitizeData({
-                step: newStep,
-                timestamp: timestamp,
-                version: version,
-                deviceId: window.deviceId || 'unknown'
-            });
-            saveToBoth(storageKey, JSON.stringify(data));
+            // Añadir nueva clase
+            el.addClass('step' + newStep);
+            el.data('actual-step', newStep);
+
+            // Guardar en localStorage
+            localStorage.setItem(storageKey, newStep);
         });
 
         // Restaurar estado desde localStorage
-        const savedData = localStorage.getItem(storageKey);
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                updateElementColor(el, data.step, data.timestamp, data.version);
-            } catch (e) {
-                // Fallback para datos antiguos
-                const savedStep = parseInt(savedData) || 0;
-                updateElementColor(el, savedStep, 0, generateVersionId());
+        const savedStep = localStorage.getItem(storageKey);
+        if (savedStep) {
+            for (let i = 1; i <= stepsCount; i++) {
+                el.removeClass('step' + i);
             }
+            el.addClass('step' + savedStep);
+            el.data('actual-step', savedStep);
         }
     });
 }
@@ -1024,6 +1010,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contextMenu = document.getElementById('colorContextMenu');
     let activeSunbed = null;
 
+    // Mostrar menú contextual al hacer clic derecho o mantener pulsado
     document.addEventListener('contextmenu', function(e) {
         const sunbed = e.target.closest('.sunbed');
         if (sunbed) {
@@ -1035,334 +1022,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Cerrar menú al hacer clic en cualquier lugar
     document.addEventListener('click', function(e) {
         if (!contextMenu.contains(e.target)) {
             contextMenu.style.display = 'none';
         }
     });
 
+    // Manejar la selección de color
     contextMenu.addEventListener('click', function(e) {
         const colorOption = e.target.closest('.color-option');
         if (colorOption && activeSunbed) {
             const step = colorOption.dataset.step;
+            
+            // Eliminar clases anteriores
+            for (let i = 1; i <= 6; i++) {
+                activeSunbed.classList.remove('step' + i);
+            }
+            
+            // Añadir nueva clase
+            activeSunbed.classList.add('step' + step);
+            activeSunbed.dataset.actualStep = step;
+            
+            // Guardar en localStorage
             const sunbedId = activeSunbed.id;
-            const timestamp = getCurrentTimestamp();
+            localStorage.setItem('sunbed_color' + sunbedId, step);
             
-            // Actualizar el elemento localmente
-            updateElementColor($(activeSunbed), step, timestamp, generateVersionId());
-            
-            // Guardar en localStorage y Firebase
-            const data = sanitizeData({
-                step: step,
-                timestamp: timestamp,
-                version: generateVersionId(),
-                deviceId: window.deviceId || 'unknown'
-            });
-            saveToBoth('sunbed_color_' + sunbedId, JSON.stringify(data));
-            
+            // Ocultar menú
             contextMenu.style.display = 'none';
         }
     });
 
+    // Cerrar menú al hacer scroll
     window.addEventListener('scroll', function() {
         contextMenu.style.display = 'none';
     });
-});
-
-// Función para guardar en localStorage y Firebase
-function saveToBoth(key, value) {
-    localStorage.setItem(key, value);
-    if (window.syncElementToFirebase) {
-        window.syncElementToFirebase(key, value);
-    }
-}
-
-// Función para guardar JSON en localStorage y Firebase
-function saveJSONToBoth(key, value) {
-    const jsonValue = JSON.stringify(value);
-    localStorage.setItem(key, jsonValue);
-    if (window.syncElementToFirebase) {
-        window.syncElementToFirebase(key, value);
-    }
-}
-
-// Modificar la función que guarda el historial
-function guardarEnHistorial(fecha, hamaca, total, recibido, cambio, metodo) {
-    let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
-    datosHistorial.push({
-        fecha,
-        hamaca: hamaca || "-",
-        total: total.toFixed(2),
-        recibido: recibido.toFixed(2),
-        cambio: cambio.toFixed(2),
-        metodo
-    });
-    saveJSONToBoth("historial", datosHistorial);
-
-    let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
-    operaciones.push({
-        fecha,
-        hamaca: hamaca || "-",
-        pagado: total.toFixed(2),
-        devuelto: ""
-    });
-    saveJSONToBoth("operaciones", operaciones);
-}
-
-// Función para sincronizar colores con Firebase
-function syncColorsToFirebase() {
-    const timestamp = getCurrentTimestamp();
-    const version = generateVersionId();
-    
-    $('.sunbed').each(function() {
-        const sunbed = $(this);
-        const sunbedId = sunbed.attr('id');
-        const currentStep = parseInt(sunbed.data('actual-step')) || 0;
-        const lastUpdate = parseInt(sunbed.data('last-update')) || 0;
-        const currentVersion = sunbed.data('version') || '';
-        
-        if (currentStep && (timestamp > lastUpdate || !currentVersion)) {
-            const data = sanitizeData({
-                step: currentStep,
-                timestamp: timestamp,
-                version: version,
-                deviceId: window.deviceId || 'unknown'
-            });
-            saveToBoth('sunbed_color_' + sunbedId, JSON.stringify(data));
-            sunbed.data('last-update', timestamp);
-            sunbed.data('version', version);
-        }
-    });
-
-    $('.circle').each(function() {
-        const circle = $(this);
-        const circleId = circle.attr('id');
-        const currentStep = parseInt(circle.data('actual-step')) || 0;
-        const lastUpdate = parseInt(circle.data('last-update')) || 0;
-        const currentVersion = circle.data('version') || '';
-        
-        if (currentStep && (timestamp > lastUpdate || !currentVersion)) {
-            const data = sanitizeData({
-                step: currentStep,
-                timestamp: timestamp,
-                version: version,
-                deviceId: window.deviceId || 'unknown'
-            });
-            saveToBoth('circle_color_' + circleId, JSON.stringify(data));
-            circle.data('last-update', timestamp);
-            circle.data('version', version);
-        }
-    });
-}
-
-// Generar ID único para el dispositivo
-window.deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
-
-// Configurar sincronización periódica
-setInterval(function() {
-    syncColorsToFirebase();
-}, 5000); // Sincronizar cada 5 segundos
-
-// Sistema de sincronización robusto
-const SyncSystem = {
-    queue: [],
-    lastSync: {},
-    isProcessing: false,
-    deviceId: 'device_' + Math.random().toString(36).substr(2, 9),
-    
-    // Obtener timestamp actual
-    getTimestamp() {
-        return Date.now();
-    },
-
-    // Generar ID único para cambios
-    generateChangeId() {
-        return `${this.deviceId}_${this.getTimestamp()}`;
-    },
-
-    // Sanitizar datos
-    sanitizeData(data) {
-        if (typeof data === 'number' && isNaN(data)) return 0;
-        if (typeof data === 'object') {
-            const sanitized = {};
-            for (const key in data) {
-                if (data.hasOwnProperty(key)) {
-                    sanitized[key] = this.sanitizeData(data[key]);
-                }
-            }
-            return sanitized;
-        }
-        return data;
-    },
-
-    // Añadir cambio a la cola
-    queueChange(element, change) {
-        const changeId = this.generateChangeId();
-        const timestamp = this.getTimestamp();
-        
-        this.queue.push({
-            id: changeId,
-            timestamp,
-            element,
-            change,
-            deviceId: this.deviceId
-        });
-
-        // Procesar la cola si no está en proceso
-        if (!this.isProcessing) {
-            this.processQueue();
-        }
-    },
-
-    // Procesar la cola de cambios
-    async processQueue() {
-        if (this.isProcessing || this.queue.length === 0) return;
-        
-        this.isProcessing = true;
-        
-        while (this.queue.length > 0) {
-            const change = this.queue[0];
-            try {
-                await this.applyChange(change);
-                this.queue.shift(); // Remover el cambio procesado
-            } catch (error) {
-                console.error('Error procesando cambio:', error);
-                // Si hay error, esperar y reintentar
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-        }
-        
-        this.isProcessing = false;
-    },
-
-    // Aplicar un cambio
-    async applyChange(change) {
-        const { element, change: changeData, timestamp, deviceId } = change;
-        const elementId = $(element).attr('id');
-        const currentData = this.lastSync[elementId] || {};
-        
-        // Verificar si el cambio es más reciente
-        if (timestamp > (currentData.timestamp || 0)) {
-            // Actualizar el elemento
-            this.updateElement(element, changeData);
-            
-            // Guardar en localStorage y Firebase
-            const data = this.sanitizeData({
-                ...changeData,
-                timestamp,
-                deviceId
-            });
-            
-            // Guardar en localStorage
-            localStorage.setItem(`sync_${elementId}`, JSON.stringify(data));
-            
-            // Sincronizar con Firebase
-            if (window.syncElementToFirebase) {
-                await window.syncElementToFirebase(`sync_${elementId}`, data);
-            }
-            
-            // Actualizar último estado conocido
-            this.lastSync[elementId] = data;
-        }
-    },
-
-    // Actualizar elemento visualmente
-    updateElement(element, data) {
-        const $element = $(element);
-        
-        if (data.step) {
-            // Actualizar color
-            for (let i = 1; i <= 6; i++) {
-                $element.removeClass('step' + i);
-            }
-            $element.addClass('step' + data.step);
-            $element.data('actual-step', data.step);
-        }
-        
-        if (data.visibility !== undefined) {
-            $element.css('visibility', data.visibility);
-        }
-        
-        if (data.text !== undefined) {
-            $element.find('.customer_name').val(data.text);
-        }
-        
-        $element.data('last-update', data.timestamp);
-    },
-
-    // Inicializar sincronización
-    init() {
-        // Cargar estados guardados
-        this.loadSavedStates();
-        
-        // Configurar sincronización periódica
-        setInterval(() => this.syncAll(), 5000);
-        
-        // Configurar listeners para cambios
-        this.setupChangeListeners();
-    },
-
-    // Cargar estados guardados
-    loadSavedStates() {
-        $('.sunbed, .circle').each((_, element) => {
-            const elementId = $(element).attr('id');
-            const savedData = localStorage.getItem(`sync_${elementId}`);
-            
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    this.lastSync[elementId] = data;
-                    this.updateElement(element, data);
-                } catch (e) {
-                    console.error('Error cargando estado guardado:', e);
-                }
-            }
-        });
-    },
-
-    // Configurar listeners para cambios
-    setupChangeListeners() {
-        // Listener para cambios de color
-        $('.sunbed, .circle').on('dblclick', (e) => {
-            const element = e.currentTarget;
-            const currentStep = parseInt($(element).data('actual-step')) || 0;
-            const newStep = currentStep >= 6 ? 1 : currentStep + 1;
-            
-            this.queueChange(element, { step: newStep });
-        });
-
-        // Listener para cambios de texto
-        $('.customer_name').on('input', (e) => {
-            const element = $(e.target).closest('.sunbed')[0];
-            this.queueChange(element, { text: e.target.value });
-        });
-
-        // Listener para cambios de visibilidad
-        $('.toggle').on('click', (e) => {
-            const element = e.currentTarget;
-            const currentVisibility = $(element).css('visibility');
-            const newVisibility = currentVisibility === 'hidden' ? 'visible' : 'hidden';
-            
-            this.queueChange(element, { visibility: newVisibility });
-        });
-    },
-
-    // Sincronizar todos los elementos
-    async syncAll() {
-        $('.sunbed, .circle').each((_, element) => {
-            const elementId = $(element).attr('id');
-            const currentData = {
-                step: parseInt($(element).data('actual-step')) || 0,
-                visibility: $(element).css('visibility'),
-                text: $(element).find('.customer_name').val()
-            };
-            
-            this.queueChange(element, currentData);
-        });
-    }
-};
-
-// Inicializar el sistema de sincronización
-$(document).ready(() => {
-    SyncSystem.init();
 });
