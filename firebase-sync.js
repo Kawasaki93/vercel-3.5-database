@@ -228,6 +228,23 @@ function updateTotalsUI(totalSold) {
     $('#totalGeneral').text(totalSold.general || '0.00');
 }
 
+// Función de utilidad para guardar en localStorage y Firebase
+function saveToBoth(key, value) {
+    console.log(`Guardando ${key} en localStorage y Firebase:`, value);
+    
+    // Guardar en localStorage
+    if (typeof value === 'object') {
+        localStorage.setItem(key, JSON.stringify(value));
+    } else {
+        localStorage.setItem(key, value);
+    }
+    
+    // Guardar en Firebase
+    return syncElementToFirebase(`localStorage/${key}`, value)
+        .then(() => console.log(`✅ ${key} guardado en Firebase`))
+        .catch(error => console.error(`❌ Error al guardar ${key} en Firebase:`, error));
+}
+
 // Sincronizar cada 5 minutos
 setInterval(syncAllLocalStorageToFirebase, 300000);
 
@@ -248,8 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const value = $(this).val();
         console.log(`Cambio en nombre de cliente ${id}: ${value}`);
         const key = 'customer_name' + id;
-        localStorage.setItem(key, value);
-        syncAllLocalStorageToFirebase();
+        saveToBoth(key, value);
     });
 
     // Variables para el doble click
@@ -269,9 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const nextStep = ((parseInt(currentStep) + 2) % 6) + 1;
             console.log(`Doble click en hamaca ${id}: de ${currentStep} a ${nextStep}`);
             const key = 'sunbed_color' + id;
-            localStorage.setItem(key, nextStep);
+            saveToBoth(key, nextStep);
             updateSunbedColor($(this), nextStep);
-            syncAllLocalStorageToFirebase();
         }
         
         lastClickTime = currentTime;
@@ -285,9 +300,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const filaNum = buttonText.replace('Fila', '');
             const isVisible = localStorage.getItem(`fila${filaNum}_visible`) !== 'true';
             console.log(`Cambio en visibilidad de fila ${filaNum}: ${isVisible}`);
-            localStorage.setItem(`fila${filaNum}_visible`, isVisible);
+            const key = `fila${filaNum}_visible`;
+            saveToBoth(key, isVisible);
             updateFilaVisibility(filaNum, isVisible);
-            syncAllLocalStorageToFirebase();
         }
     });
 
@@ -296,15 +311,34 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Agregando al historial:', item);
         const historial = JSON.parse(localStorage.getItem('historial') || '[]');
         historial.push(item);
-        localStorage.setItem('historial', JSON.stringify(historial));
-        syncAllLocalStorageToFirebase();
+        saveToBoth('historial', historial);
     };
 
     // Escuchar cambios en los totales
     window.updateTotals = function(totals) {
         console.log('Actualizando totales:', totals);
-        localStorage.setItem('total_sold', JSON.stringify(totals));
-        syncAllLocalStorageToFirebase();
+        saveToBoth('total_sold', totals);
+    };
+
+    // Función para resetear localStorage
+    window.resetLocalStorage = function() {
+        console.log('Reseteando localStorage...');
+        localStorage.clear();
+        // También reseteamos en Firebase
+        syncElementToFirebase('localStorage', {})
+            .then(() => console.log('✅ Firebase reseteado'))
+            .catch(error => console.error('❌ Error al resetear Firebase:', error));
+    };
+
+    // Función para resetear colores
+    window.resetColors = function() {
+        console.log('Reseteando colores...');
+        $(".sunbed").each(function() {
+            const id = $(this).attr('id');
+            const key = 'sunbed_color' + id;
+            saveToBoth(key, '1'); // Resetear a LightSeaGreen
+            updateSunbedColor($(this), '1');
+        });
     };
 
     // Forzar una sincronización inicial
