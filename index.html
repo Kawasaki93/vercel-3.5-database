@@ -14,6 +14,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     window.initializeFirebase = function(config) {
+      console.log('Inicializando Firebase con config:', config);
       const app = initializeApp(config);
       return getDatabase(app);
     };

@@ -17,6 +17,44 @@ const firebaseConfig = {
 // Inicializar Firebase
 const database = window.initializeFirebase(firebaseConfig);
 
+// Función para probar la conexión con Firebase
+window.testFirebaseConnection = function() {
+    console.log('Iniciando prueba de Firebase...');
+    const statusDiv = document.getElementById('firebaseStatus');
+    if (!statusDiv) {
+        console.error('No se encontró el elemento firebaseStatus');
+        return;
+    }
+    
+    statusDiv.textContent = 'Probando conexión...';
+    console.log('Intentando escribir en Firebase...');
+    
+    // Intentar escribir un dato de prueba
+    database.ref('test').set({
+        timestamp: new Date().toISOString(),
+        message: 'Test de conexión'
+    })
+    .then(() => {
+        console.log('Escritura exitosa, intentando leer...');
+        return database.ref('test').once('value');
+    })
+    .then((snapshot) => {
+        const data = snapshot.val();
+        console.log('Datos leídos:', data);
+        if (data) {
+            statusDiv.textContent = '✅ Conexión exitosa!';
+            statusDiv.style.color = 'green';
+        } else {
+            throw new Error('No se pudieron leer los datos');
+        }
+    })
+    .catch((error) => {
+        console.error('Error en la prueba:', error);
+        statusDiv.textContent = '❌ Error de conexión: ' + error.message;
+        statusDiv.style.color = 'red';
+    });
+};
+
 // Función para sincronizar localStorage con Firebase
 function syncWithFirebase() {
     // Sincronizar nombres de clientes
@@ -101,39 +139,11 @@ function loadFromFirebase() {
     });
 }
 
-// Función para probar la conexión con Firebase
-function testFirebaseConnection() {
-    const statusDiv = document.getElementById('firebaseStatus');
-    statusDiv.textContent = 'Probando conexión...';
-    
-    // Intentar escribir un dato de prueba
-    database.ref('test').set({
-        timestamp: new Date().toISOString(),
-        message: 'Test de conexión'
-    })
-    .then(() => {
-        // Si la escritura es exitosa, intentar leer
-        return database.ref('test').once('value');
-    })
-    .then((snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            statusDiv.textContent = '✅ Conexión exitosa!';
-            statusDiv.style.color = 'green';
-            console.log('Datos de prueba:', data);
-        } else {
-            throw new Error('No se pudieron leer los datos');
-        }
-    })
-    .catch((error) => {
-        statusDiv.textContent = '❌ Error de conexión: ' + error.message;
-        statusDiv.style.color = 'red';
-        console.error('Error:', error);
-    });
-}
-
 // Sincronizar cada 5 minutos
 setInterval(syncWithFirebase, 300000);
 
 // Cargar datos al iniciar
-document.addEventListener('DOMContentLoaded', loadFromFirebase); 
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM cargado, inicializando Firebase...');
+    loadFromFirebase();
+}); 
