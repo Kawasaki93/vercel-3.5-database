@@ -12,12 +12,33 @@
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="./style.css">
   <link rel="manifest" href="/manifest.json">
+  <!-- Scripts de Firebase -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  <script type="module" src="./firebase-config.js"></script>
+  <script type="module" src="./firebase-sync.js"></script>
+  <script type="module" src="./auth-check.js"></script>
+  <script type="module">
+    import { checkAuth } from './auth-check.js';
+    
+    // Verificar autenticación antes de cargar la página
+    checkAuth().then(user => {
+      document.getElementById('userEmail').textContent = user.email;
+    }).catch(() => {
+      // La redirección se maneja en checkAuth
+    });
+  </script>
 </head>
 <body>
 
 <div class="left_panel">
   <h3>Playa&nbsp;Juan</h3>
   <div id="current_date"></div>
+  <div id="userInfo" style="margin: 10px 0;">
+    <span id="userEmail"></span>
+    <button class="button" onclick="logout()">Cerrar Sesión</button>
+  </div>
   <script>
     const date = new Date();
     const year = date.getFullYear();
@@ -142,6 +163,33 @@
   </div>
 </div>
 <!-- Scripts personalizados -->
+<script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+<script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+<script type="module" src="./firebase-config.js"></script>
+<script type="module" src="./firebase-sync.js"></script>
+<script type="module">
+    import { firebaseSync } from './firebase-sync.js';
+    
+    // Verificar autenticación
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('userEmail').textContent = user.email;
+        }
+    });
+
+    // Función de cierre de sesión
+    window.logout = async () => {
+        try {
+            await firebaseSync.logoutUser();
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+        }
+    };
+</script>
 <script src="./script.js"></script>
 
 <!-- Menú contextual de colores -->
@@ -153,13 +201,5 @@
   <div class="color-option step5" data-step="5"></div>
   <div class="color-option step6" data-step="6"></div>
 </div>
-
-<!-- Firebase -->
-<script type="module" src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
-<script type="module" src="https://www.gstatic.com/firebasejs/9.x.x/firebase-analytics.js"></script>
-<script type="module" src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore.js"></script>
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="init-firebase.js"></script>
-<script type="module" src="script.js"></script>
 </body>
 </html>

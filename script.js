@@ -1,6 +1,3 @@
-import { db } from './firebase-config.js';
-import { collection, doc, updateDoc, addDoc, getDocs, query, where, orderBy, serverTimestamp } from 'firebase/firestore';
-
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((reg) => {
@@ -10,6 +7,8 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+
+
 
 let variable1;
 for (var x = 1; x < 126; x++) {
@@ -235,7 +234,11 @@ for (var x = 1; x < 126; x++) {
     cloned_element.find(".sunbed_name").html(1);
 } else if (x === 125) {
     cloned_element.find(".sunbed_name").html(0);
+
+
+
 }
+
 
   $(".beach_wrapper").append(cloned_element);
 }
@@ -278,6 +281,8 @@ $("#clon_83,#clon_84,#clon_85,#clon_89,#clon_90,#clon_91,#clon_92,#clon_93,#clon
 //DE LA 8ª FILA DEL 1 AL 10
 
 //Clicking function-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 //clear localstorage
 function clearClick(number) {
@@ -383,6 +388,9 @@ $(document).ready(function() {
     }
 });
 
+
+
+
 //VISIBILIDAD DE LA FILA 1-----------------------------------
 function toggledesconectadosFila1() {
     var $desconectadosFila1 = $(".desconectadosFila1");
@@ -478,6 +486,7 @@ $(document).ready(function() {
         $(".Zonalibre2").css("visibility", "hidden");
     }
 });
+
 
 //VISIBILIDAD DEL CLON 10A--------------------------------------  
 function toggleclon10A() {
@@ -691,73 +700,68 @@ SunbedController.init();
 let totalEfectivo = 0;
 let totalTarjeta = 0;
 
-async function calcularCambio() {
-    try {
-        const hamaca = document.getElementById('hamaca').value;
-        const totalSelect = parseFloat(document.getElementById('totalSelect').value) || 0;
-        const totalManual = parseFloat(document.getElementById('totalManual').value) || 0;
-        const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value) || 0;
-        const recibidoManual = parseFloat(document.getElementById('recibidoManual').value) || 0;
-        const metodo = document.getElementById('pago').value;
+function calcularCambio() {
+  const hamaca = document.getElementById('hamaca').value;
+  const totalSelect = parseFloat(document.getElementById('totalSelect').value);
+  const totalManual = parseFloat(document.getElementById('totalManual').value);
+  const recibidoSelect = parseFloat(document.getElementById('recibidoSelect').value);
+  const recibidoManual = parseFloat(document.getElementById('recibidoManual').value);
+  const metodo = document.getElementById('pago').value;
 
-        const total = totalManual || totalSelect;
-        const recibido = recibidoManual || recibidoSelect;
+  const total = totalManual || totalSelect;
+  const recibido = recibidoManual || recibidoSelect;
 
-        if (isNaN(total) || isNaN(recibido)) {
-            alert("Por favor, introduce montos válidos.");
-            return;
-        }
+  if (isNaN(total) || isNaN(recibido)) {
+    alert("Por favor, introduce montos válidos.");
+    return;
+  }
 
-        if (recibido < total) {
-            alert("El monto recibido debe ser mayor o igual al total a pagar.");
-            return;
-        }
+  const cambio = recibido - total;
+  document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
 
-        const cambio = recibido - total;
-        document.getElementById('resultado').textContent = `Cambio: €${cambio.toFixed(2)}`;
+  const historial = document.getElementById('historial');
+  const li = document.createElement('li');
 
-        // Guardar en Firebase
-        const operationData = {
-            fecha: serverTimestamp(),
-            hamaca: hamaca || "-",
-            total: total.toFixed(2),
-            recibido: recibido.toFixed(2),
-            cambio: cambio.toFixed(2),
-            metodo,
-            tipo: 'venta'
-        };
+  const fechaObj = new Date();
+  const dia = String(fechaObj.getDate()).padStart(2, '0');
+  const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+  const anio = fechaObj.getFullYear();
+  const horas = String(fechaObj.getHours()).padStart(2, '0');
+  const minutos = String(fechaObj.getMinutes()).padStart(2, '0');
+  const fecha = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
 
-        await addDoc(collection(db, 'operations'), operationData);
+  li.textContent = `Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Recibido: €${recibido.toFixed(2)} - Cambio: €${cambio.toFixed(2)} - Método: ${metodo} - ${fecha}`;
+  historial.insertBefore(li, historial.firstChild);
 
-        // Actualizar el historial en la UI
-        const historial = document.getElementById('historial');
-        const li = document.createElement('li');
-        li.textContent = `Hamaca ${hamaca} - Total: €${total.toFixed(2)} - Recibido: €${recibido.toFixed(2)} - Cambio: €${cambio.toFixed(2)} - Método: ${metodo} - ${new Date().toLocaleString()}`;
-        historial.insertBefore(li, historial.firstChild);
+  if (metodo === 'efectivo') {
+    totalEfectivo += total;
+  } else {
+    totalTarjeta += total;
+  }
 
-        // Actualizar totales
-        if (metodo === 'efectivo') {
-            totalEfectivo += total;
-        } else {
-            totalTarjeta += total;
-        }
+  document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
+  document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
+  document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-        document.getElementById('totalEfectivo').textContent = totalEfectivo.toFixed(2);
-        document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
-        document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
+  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
+  datosHistorial.push({
+    fecha,
+    hamaca: hamaca || "-",
+    total: total.toFixed(2),
+    recibido: recibido.toFixed(2),
+    cambio: cambio.toFixed(2),
+    metodo
+  });
+  localStorage.setItem("historial", JSON.stringify(datosHistorial));
 
-        // Limpiar campos después de la operación
-        document.getElementById('hamaca').value = '';
-        document.getElementById('totalSelect').selectedIndex = 0;
-        document.getElementById('totalManual').value = '';
-        document.getElementById('recibidoSelect').selectedIndex = 0;
-        document.getElementById('recibidoManual').value = '';
-        document.getElementById('pago').selectedIndex = 0;
-
-    } catch (error) {
-        console.error("Error al guardar la operación:", error);
-        alert("Error al guardar la operación. Por favor, inténtalo de nuevo.");
-    }
+  let operaciones = JSON.parse(localStorage.getItem("operaciones")) || [];
+  operaciones.push({
+    fecha,
+    hamaca: hamaca || "-",
+    pagado: total.toFixed(2),
+    devuelto: ""
+  });
+  localStorage.setItem("operaciones", JSON.stringify(operaciones));
 }
 
 function procesarDevolucion() {
@@ -810,7 +814,7 @@ function procesarDevolucion() {
   document.getElementById('totalTarjeta').textContent = totalTarjeta.toFixed(2);
   document.getElementById('totalGeneral').textContent = (totalEfectivo + totalTarjeta).toFixed(2);
 
-  // Guardamos el historial en Firebase
+  // Guardamos el historial en localStorage
   let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
   datosHistorial.push({
     fecha,
@@ -837,69 +841,59 @@ function toggleHistorial() {
   historialContainer.style.display = historialContainer.style.display === 'none' ? 'block' : 'none';
 }
 
-async function descargarHistorial() {
-    try {
-        const startDate = new Date();
-        startDate.setMonth(startDate.getMonth() - 1); // Último mes
+function descargarHistorial() {
+  let datosHistorial = JSON.parse(localStorage.getItem("historial")) || [];
 
-        const operationsQuery = query(
-            collection(db, 'operations'),
-            where('fecha', '>=', startDate),
-            orderBy('fecha', 'desc')
-        );
+  const resumenDiario = {};
+  const resumenMensual = {};
 
-        const querySnapshot = await getDocs(operationsQuery);
-        const resumenDiario = {};
-        const resumenMensual = {};
+  datosHistorial.forEach(entry => {
+    // Manejo correcto para fechas en formato DD/MM/YYYY
+    let [dia, mes, anioHora] = entry.fecha.split('/');
+    let [anio] = anioHora.split(' ');
+    let fecha = new Date(`${anio}-${mes}-${dia}`);
 
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const fecha = data.fecha.toDate();
-            const diaClave = `${String(fecha.getDate()).padStart(2, '0')}/${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
-            const mesClave = `${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
-            const total = parseFloat(data.total || 0);
-            const metodo = data.metodo;
+    const diaClave = `${String(fecha.getDate()).padStart(2, '0')}/${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
+    const mesClave = `${String(fecha.getMonth() + 1).padStart(2, '0')}/${fecha.getFullYear()}`;
+    const total = parseFloat(entry.total || 0);
+    const metodo = entry.metodo;
 
-            if (!resumenDiario[diaClave]) {
-                resumenDiario[diaClave] = { efectivo: 0, tarjeta: 0 };
-            }
-            if (!resumenMensual[mesClave]) {
-                resumenMensual[mesClave] = { efectivo: 0, tarjeta: 0 };
-            }
-
-            if (metodo === 'efectivo') {
-                resumenDiario[diaClave].efectivo += total;
-                resumenMensual[mesClave].efectivo += total;
-            } else {
-                resumenDiario[diaClave].tarjeta += total;
-                resumenMensual[mesClave].tarjeta += total;
-            }
-        });
-
-        let csv = "Resumen Diario\nDía,Efectivo,Tarjeta,Total\n";
-        for (let dia in resumenDiario) {
-            const d = resumenDiario[dia];
-            csv += `${dia},${d.efectivo.toFixed(2)},${d.tarjeta.toFixed(2)},${(d.efectivo + d.tarjeta).toFixed(2)}\n`;
-        }
-
-        csv += "\nResumen Mensual\nMes,Efectivo,Tarjeta,Total\n";
-        for (let mes in resumenMensual) {
-            const m = resumenMensual[mes];
-            csv += `${mes},${m.efectivo.toFixed(2)},${m.tarjeta.toFixed(2)},${(m.efectivo + m.tarjeta).toFixed(2)}\n`;
-        }
-
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", "resumen_contabilidad.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } catch (error) {
-        console.error("Error al descargar el historial:", error);
-        alert("Error al descargar el historial. Por favor, inténtalo de nuevo.");
+    if (!resumenDiario[diaClave]) {
+      resumenDiario[diaClave] = { efectivo: 0, tarjeta: 0 };
     }
+    if (!resumenMensual[mesClave]) {
+      resumenMensual[mesClave] = { efectivo: 0, tarjeta: 0 };
+    }
+
+    if (metodo === 'efectivo') {
+      resumenDiario[diaClave].efectivo += total;
+      resumenMensual[mesClave].efectivo += total;
+    } else {
+      resumenDiario[diaClave].tarjeta += total;
+      resumenMensual[mesClave].tarjeta += total;
+    }
+  });
+
+  let csv = "Resumen Diario\nDía,Efectivo,Tarjeta,Total\n";
+  for (let dia in resumenDiario) {
+    const d = resumenDiario[dia];
+    csv += `${dia},${d.efectivo.toFixed(2)},${d.tarjeta.toFixed(2)},${(d.efectivo + d.tarjeta).toFixed(2)}\n`;
+  }
+
+  csv += "\nResumen Mensual\nMes,Efectivo,Tarjeta,Total\n";
+  for (let mes in resumenMensual) {
+    const m = resumenMensual[mes];
+    csv += `${mes},${m.efectivo.toFixed(2)},${m.tarjeta.toFixed(2)},${(m.efectivo + m.tarjeta).toFixed(2)}\n`;
+  }
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "resumen_contabilidad_2025.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 
@@ -949,6 +943,7 @@ function descargarLog() {
   document.body.removeChild(link);
 }
 
+
 //FUNCIONAMIENTO DE SERVICE WORKER NO TOCAR
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -960,18 +955,19 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+
+
+
+
 // Bucle de colores para los círculos
+
 
 function setupColorCycle(selector, stepsCount, storagePrefix) {
     $(selector).each(function (index) {
         const el = $(this);
-        const sunbedId = el.attr('id');
+        const storageKey = storagePrefix + index;
 
-        // Mantener la visibilidad original
-        const originalDisplay = el.css('display');
-        el.css('display', originalDisplay);
-
-        el.on('dblclick', async function (event) {
+        el.on('dblclick', function (event) {
             event.stopPropagation();
 
             const currentStep = parseInt(el.data('actual-step')) || 0;
@@ -986,27 +982,26 @@ function setupColorCycle(selector, stepsCount, storagePrefix) {
             el.addClass('step' + newStep);
             el.data('actual-step', newStep);
 
-            try {
-                // Guardar en Firebase
-                if (selector === '.sunbed') {
-                    await updateDoc(doc(db, 'sunbeds', sunbedId), {
-                        colorStep: newStep
-                    });
-                } else if (selector === '.circle') {
-                    await updateDoc(doc(db, 'sunbeds', sunbedId), {
-                        circleColorStep: newStep
-                    });
-                }
-            } catch (error) {
-                console.error("Error al actualizar el color:", error);
-            }
+            // Guardar en localStorage
+            localStorage.setItem(storageKey, newStep);
         });
+
+        // Restaurar estado desde localStorage
+        const savedStep = localStorage.getItem(storageKey);
+        if (savedStep) {
+            for (let i = 1; i <= stepsCount; i++) {
+                el.removeClass('step' + i);
+            }
+            el.addClass('step' + savedStep);
+            el.data('actual-step', savedStep);
+        }
     });
 }
 
 // Aplicamos color cycle separado
 setupColorCycle('.circle', 3, 'circle_color_');
 setupColorCycle('.sunbed', 6, 'sunbed_color_');
+
 
 //------zona pruebas
 
@@ -1022,13 +1017,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             activeSunbed = sunbed;
             contextMenu.style.display = 'block';
-            
-            // Obtener la posición de la sunbed
-            const sunbedRect = sunbed.getBoundingClientRect();
-            
-            // Posicionar el menú justo encima de la sunbed
-            contextMenu.style.left = (sunbedRect.left + window.scrollX) + 'px';
-            contextMenu.style.top = (sunbedRect.top + window.scrollY - contextMenu.offsetHeight - 10) + 'px';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
         }
     });
 
@@ -1054,11 +1044,9 @@ document.addEventListener('DOMContentLoaded', function() {
             activeSunbed.classList.add('step' + step);
             activeSunbed.dataset.actualStep = step;
             
-            // Guardar en Firebase
+            // Guardar en localStorage
             const sunbedId = activeSunbed.id;
-            sunbedsRef.doc(sunbedId).update({
-                colorStep: step
-            });
+            localStorage.setItem('sunbed_color' + sunbedId, step);
             
             // Ocultar menú
             contextMenu.style.display = 'none';
@@ -1069,32 +1057,4 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', function() {
         contextMenu.style.display = 'none';
     });
-});
-
-// Asegurar que las sunbeds sean visibles al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    // Restaurar visibilidad de las sunbeds
-    $('.sunbed').each(function() {
-        const el = $(this);
-        if (!el.hasClass('desconectadosgeneral') && 
-            !el.hasClass('desconectadosFila0') && 
-            !el.hasClass('desconectadosFila1') && 
-            !el.hasClass('desconectadosFila2') && 
-            !el.hasClass('desconectadosFila3') && 
-            !el.hasClass('desconectadosFila4') && 
-            !el.hasClass('desconectadosfila8') && 
-            !el.hasClass('Zonalibre') && 
-            !el.hasClass('Zonalibre2') && 
-            !el.hasClass('clon10A') && 
-            !el.hasClass('clon0')) {
-            el.css('visibility', 'visible');
-        }
-    });
-
-    // Inicializar la calculadora
-    totalEfectivo = 0;
-    totalTarjeta = 0;
-    document.getElementById('totalEfectivo').textContent = '0.00';
-    document.getElementById('totalTarjeta').textContent = '0.00';
-    document.getElementById('totalGeneral').textContent = '0.00';
 });
