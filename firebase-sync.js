@@ -6,7 +6,8 @@ import {
     getDoc, 
     onSnapshot,
     serverTimestamp,
-    runTransaction
+    runTransaction,
+    enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import {
     createUserWithEmailAndPassword,
@@ -21,7 +22,19 @@ class FirebaseSync {
         this.lastLocalVersion = 0;
         this.syncInProgress = false;
         this.lastSunbedUpdate = 0;
+        this.retryCount = 0;
+        this.maxRetries = 3;
         this.setupAuthListener();
+        this.enableOfflinePersistence();
+    }
+
+    async enableOfflinePersistence() {
+        try {
+            await enableIndexedDbPersistence(db);
+            console.log('Persistencia offline habilitada');
+        } catch (error) {
+            console.error('Error al habilitar persistencia offline:', error);
+        }
     }
 
     setupAuthListener() {
@@ -52,52 +65,57 @@ class FirebaseSync {
             } else {
                 await this.syncAllData();
             }
+            this.retryCount = 0; // Reset retry count on success
         } catch (error) {
             console.error('Error al inicializar sincronización:', error);
+            if (this.retryCount < this.maxRetries) {
+                this.retryCount++;
+                setTimeout(() => this.initializeSync(), 2000 * this.retryCount);
+            }
         }
     }
 
     async mergeData(serverData) {
-        // Función específica para fusionar colores de hamacas
-        const mergeSunbedColors = (local, server) => {
-            const result = { ...local };
-            const currentTime = Date.now();
-
-            // Asegurarse de que los datos locales tengan timestamps
-            Object.keys(result).forEach(key => {
-                if (!result[key].timestamp) {
-                    result[key].timestamp = currentTime;
-                }
-            });
-
-            // Fusionar con datos del servidor
-            for (const key in server) {
-                const serverColor = server[key];
-                const localColor = result[key];
-
-                // Si el color del servidor es más reciente o no existe localmente
-                if (!localColor || serverColor.timestamp > localColor.timestamp) {
-                    result[key] = serverColor;
-                }
-            }
-
-            return result;
-        };
-
-        // Función para comparar y fusionar datos generales
-        const mergeObjects = (local, server) => {
-            const result = { ...local };
-            for (const key in server) {
-                if (server[key] && typeof server[key] === 'object') {
-                    result[key] = mergeObjects(local[key] || {}, server[key]);
-                } else if (!local[key] || server[key] > local[key]) {
-                    result[key] = server[key];
-                }
-            }
-            return result;
-        };
-
         try {
+            // Función específica para fusionar colores de hamacas
+            const mergeSunbedColors = (local, server) => {
+                const result = { ...local };
+                const currentTime = Date.now();
+
+                // Asegurarse de que los datos locales tengan timestamps
+                Object.keys(result).forEach(key => {
+                    if (!result[key].timestamp) {
+                        result[key].timestamp = currentTime;
+                    }
+                });
+
+                // Fusionar con datos del servidor
+                for (const key in server) {
+                    const serverColor = server[key];
+                    const localColor = result[key];
+
+                    // Si el color del servidor es más reciente o no existe localmente
+                    if (!localColor || serverColor.timestamp > localColor.timestamp) {
+                        result[key] = serverColor;
+                    }
+                }
+
+                return result;
+            };
+
+            // Función para comparar y fusionar datos generales
+            const mergeObjects = (local, server) => {
+                const result = { ...local };
+                for (const key in server) {
+                    if (server[key] && typeof server[key] === 'object') {
+                        result[key] = mergeObjects(local[key] || {}, server[key]);
+                    } else if (!local[key] || server[key] > local[key]) {
+                        result[key] = server[key];
+                    }
+                }
+                return result;
+            };
+
             // Fusionar datos de hamacas con manejo especial de colores
             const localSunbeds = JSON.parse(localStorage.getItem('sunbeds') || '{}');
             const serverSunbeds = serverData.sunbeds?.colors || {};
@@ -140,6 +158,7 @@ class FirebaseSync {
             console.log('Datos fusionados exitosamente');
         } catch (error) {
             console.error('Error al fusionar datos:', error);
+            throw error;
         }
     }
 
@@ -199,8 +218,13 @@ class FirebaseSync {
             });
 
             console.log('Datos sincronizados exitosamente');
+            this.retryCount = 0; // Reset retry count on success
         } catch (error) {
             console.error('Error al sincronizar datos:', error);
+            if (this.retryCount < this.maxRetries) {
+                this.retryCount++;
+                setTimeout(() => this.syncAllData(), 2000 * this.retryCount);
+            }
         } finally {
             this.syncInProgress = false;
         }
@@ -214,16 +238,27 @@ class FirebaseSync {
             if (doc.exists() && !this.syncInProgress) {
                 const data = doc.data();
                 if (data.version > this.lastLocalVersion) {
-                    await this.mergeData(data);
-                    this.lastLocalVersion = data.version;
-                    console.log('Datos actualizados desde Firebase');
+                    try {
+                        await this.mergeData(data);
+                        this.lastLocalVersion = data.version;
+                        console.log('Datos actualizados desde Firebase');
+                    } catch (error) {
+                        console.error('Error al actualizar datos:', error);
+                    }
                 }
+            }
+        }, (error) => {
+            console.error('Error en listener en tiempo real:', error);
+            if (this.retryCount < this.maxRetries) {
+                this.retryCount++;
+                setTimeout(() => this.setupRealtimeListeners(), 2000 * this.retryCount);
             }
         });
     }
 
     async forceSync() {
         if (this.isAuthenticated) {
+            this.retryCount = 0;
             await this.syncAllData();
         }
     }
